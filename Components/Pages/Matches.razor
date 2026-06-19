@@ -23,6 +23,7 @@ else
         <table class="table-stats">
             <thead>
                 <tr>
+                    <th>Data</th>
                     <th>Orario</th>
                     <th>Campo</th>
                     <th>Avversario</th>
@@ -39,6 +40,7 @@ else
                 {
                     var mvp = match.PlayerStats.OrderByDescending(s => s.Evaluation).FirstOrDefault();
                     <tr>
+                        <td class="text-label-caps">@match.DateTime.ToString("dd/MM")</td>
                         <td class="text-label-caps fw-bold">@match.DateTime.ToString("HH:mm")</td>
                         <td><span class="badge-location" style="background:@match.LocationBg;color:@match.LocationColor">@match.Location</span></td>
                         <td class="fw-bold">@match.Opponent</td>
@@ -88,10 +90,11 @@ else
                 </div>
                 <div class="modal-body">
                     <div class="row g-3">
-                        <div class="col-12">
-                            <small class="text-label-caps text-muted">Data fissa: 20 Giugno 2026</small>
+                        <div class="col-12 col-sm-6">
+                            <label class="text-label-caps text-secondary">Data</label>
+                            <InputDate Type="InputDateType.Date" class="form-control urban-input" @bind-Value="formDate" />
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4">
+                        <div class="col-12 col-sm-6">
                             <label class="text-label-caps text-secondary">Orario</label>
                             <InputDate Type="InputDateType.Time" class="form-control urban-input" @bind-Value="formTime" />
                         </div>
@@ -168,6 +171,7 @@ else
     private bool showModal, isEditing;
     private Match formMatch = new();
     private DateTime formTime = new(2026, 6, 20, 17, 0, 0);
+    private DateTime formDate = new(2026, 6, 20);
     private Match? deleteTarget;
     private string formMatchType = "Group";
 
@@ -179,6 +183,7 @@ else
         isEditing = false;
         formMatch = new Match { DateTime = TournamentDate, Location = "Campo B" };
         formTime = TournamentDate;
+        formDate = TournamentDate;
         formMatchType = "Group";
         showModal = true;
     }
@@ -194,6 +199,7 @@ else
             Notes = match.Notes, Status = match.Status,
         };
         formTime = match.DateTime;
+        formDate = match.DateTime;
         formMatchType = match.Type.ToString();
         showModal = true;
     }
@@ -202,7 +208,7 @@ else
 
     private async Task SaveMatch()
     {
-        formMatch.DateTime = TournamentDate.Add(formTime.TimeOfDay);
+        formMatch.DateTime = formDate.Add(formTime.TimeOfDay);
         formMatch.Type = Enum.Parse<MatchType>(formMatchType);
         if (isEditing) await MatchService.UpdateAsync(formMatch);
         else await MatchService.AddAsync(formMatch);
