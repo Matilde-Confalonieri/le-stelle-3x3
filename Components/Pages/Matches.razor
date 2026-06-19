@@ -40,12 +40,10 @@ else
                     var mvp = match.PlayerStats.OrderByDescending(s => s.Evaluation).FirstOrDefault();
                     <tr>
                         <td class="text-label-caps fw-bold">@match.DateTime.ToString("HH:mm")</td>
-                        <td class="text-nowrap">
-                            <span class="badge-status-scheduled" style="background:@match.LocationColor">@match.Location</span>
-                            <span class="badge-status-scheduled" style="background:@match.TypeColor">@match.TypeDisplay</span>
-                        </td>
-                                <td class="fw-bold">@match.Opponent</td>
-                                <td><span class="badge-status-scheduled" style="background:@match.TournamentColor">@match.Tournament</span></td>
+                        <td><span class="badge-location" style="background:@match.LocationColor">@match.Location</span></td>
+                        <td class="fw-bold">@match.Opponent</td>
+                        <td><span class="badge-type" style="background:@match.TypeColor">@match.TypeDisplay</span></td>
+                        <td><span class="badge-tournament" style="background:@match.TournamentColor">@match.Tournament</span></td>
                         <td>
                             @if (match.Status == MatchStatus.Scheduled)
                             { <span class="badge-status-scheduled">@match.StatusDisplay</span> }

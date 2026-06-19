@@ -166,7 +166,10 @@ body {
 .badge-mvp { background: var(--color-mvp); color: #1a1a00; font-family: var(--font-display); font-size: 11px; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
 .badge-victory { background: rgba(40,167,69,0.2); color: var(--color-win); font-family: var(--font-display); font-size: 11px; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 6px; }
 .badge-defeat { background: rgba(220,53,69,0.2); color: var(--color-loss); font-family: var(--font-display); font-size: 11px; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 6px; }
-.badge-status-scheduled { background: rgba(13,110,253,0.15); color: #fff; font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; white-space: nowrap; }
+.badge-status-scheduled { background: rgba(13,110,253,0.15); color: var(--color-scheduled); font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; white-space: nowrap; }
+.badge-location { font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; white-space: nowrap; color: #fff; }
+.badge-type { font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; white-space: nowrap; color: #fff; }
+.badge-tournament { font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; white-space: nowrap; color: #fff; }
 .badge-status-played { background: rgba(255,255,255,0.08); color: var(--text-secondary); font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; }
 
 /* ============ AVATARS ============ */
@@ -192,6 +195,8 @@ body {
 .form-control.urban-input:focus, .form-select.urban-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(255,122,0,0.15); outline: none; }
 .form-select.urban-input { cursor: pointer; }
 .form-select.urban-input option { background: #1a1a1a; color: var(--text); }
+input[type="file"].urban-input { color: var(--text-secondary); }
+input[type="file"].urban-input::file-selector-button { background: var(--brand); color: #fff; border: none; border-radius: 6px; padding: 0.4rem 0.8rem; margin-right: 0.75rem; font-family: var(--font-display); font-size: 12px; font-weight: 700; cursor: pointer; }
 label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; }
 
 /* ============ MODALS ============ */
