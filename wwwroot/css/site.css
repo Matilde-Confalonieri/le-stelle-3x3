@@ -216,7 +216,7 @@ label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-
 .modal-content {
     position: relative; display: flex; flex-direction: column;
     width: 100%; border: 1px solid var(--border); border-radius: 16px;
-    background: #1e1e1e; overflow: hidden;
+    background: #1e1e1e;
     pointer-events: auto;
 }
 .modal-body {
@@ -224,7 +224,7 @@ label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-
     overflow-y: auto; -webkit-overflow-scrolling: touch;
     padding: 1.5rem; max-height: 60vh; min-height: 0;
 }
-.modal-header { border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.modal-header { border-bottom: 1px solid var(--border); flex-shrink: 0; border-radius: 16px 16px 0 0; }
 .modal-footer {
     border-top: 1px solid var(--border); flex-shrink: 0;
     position: sticky; bottom: 0; background: #1e1e1e; z-index: 2;
