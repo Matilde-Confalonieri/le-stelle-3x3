@@ -34,6 +34,7 @@ public static class DbSeeder
                 Opponent = "Le Bimbe di Sele",
                 Type = MatchType.Group,
                 Status = MatchStatus.Scheduled,
+                Tournament = "Sunset",
             },
             new()
             {
@@ -42,6 +43,7 @@ public static class DbSeeder
                 Opponent = "Ducks",
                 Type = MatchType.Group,
                 Status = MatchStatus.Scheduled,
+                Tournament = "Sunset",
             },
             new()
             {
@@ -50,6 +52,7 @@ public static class DbSeeder
                 Opponent = "Abbelle Così",
                 Type = MatchType.Group,
                 Status = MatchStatus.Scheduled,
+                Tournament = "Sunset",
             },
             new()
             {
@@ -58,6 +61,7 @@ public static class DbSeeder
                 Opponent = "Da Definire",
                 Type = MatchType.Semi,
                 Status = MatchStatus.Scheduled,
+                Tournament = "Sunset",
             },
             new()
             {
@@ -66,6 +70,7 @@ public static class DbSeeder
                 Opponent = "Da Definire",
                 Type = MatchType.Semi,
                 Status = MatchStatus.Scheduled,
+                Tournament = "Sunset",
             },
         };
 

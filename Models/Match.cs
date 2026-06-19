@@ -25,6 +25,9 @@ public class Match
 
     public int TheirPoints { get; set; }
 
+    [MaxLength(100)]
+    public string Tournament { get; set; } = string.Empty;
+
     [MaxLength(500)]
     public string Notes { get; set; } = string.Empty;
 
