@@ -65,11 +65,6 @@ public class PlaybookService : IPlaybookService
         var scheme = await ctx.PlaybookSchemes.FindAsync(id);
         if (scheme != null)
         {
-            if (!string.IsNullOrEmpty(scheme.ImageUrl))
-            {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", scheme.ImageUrl.TrimStart('/'));
-                if (File.Exists(filePath)) File.Delete(filePath);
-            }
             ctx.PlaybookSchemes.Remove(scheme);
             await ctx.SaveChangesAsync();
         }
