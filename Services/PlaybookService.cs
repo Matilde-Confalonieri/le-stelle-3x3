@@ -50,10 +50,10 @@ public class PlaybookService : IPlaybookService
 
         existing.Name = scheme.Name;
         existing.Category = scheme.Category;
-        if (!string.IsNullOrEmpty(scheme.ImageUrl))
-            existing.ImageUrl = scheme.ImageUrl;
         existing.Description = scheme.Description;
         existing.Notes = scheme.Notes;
+        if (!string.IsNullOrEmpty(scheme.ImageUrl))
+            existing.ImageUrl = scheme.ImageUrl;
 
         await ctx.SaveChangesAsync();
         return existing;

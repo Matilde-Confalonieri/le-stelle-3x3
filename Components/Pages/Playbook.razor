@@ -186,7 +186,7 @@ else
     }
 
     private void OpenAdd() { isEditing = false; form = new PlaybookScheme(); formCategory = "Offense"; showModal = true; }
-    private void OpenEdit(PlaybookScheme s) { isEditing = true; form = new PlaybookScheme { Id = s.Id, Name = s.Name, Category = s.Category, Description = s.Description, Notes = s.Notes, ImageUrl = s.ImageUrl }; formCategory = s.Category.ToString(); showModal = true; }
+    private void OpenEdit(PlaybookScheme s) { isEditing = true; form = new PlaybookScheme { Id = s.Id, Name = s.Name, Category = s.Category, Description = s.Description, Notes = s.Notes }; formCategory = s.Category.ToString(); showModal = true; }
     private void CloseModal() { showModal = false; }
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
