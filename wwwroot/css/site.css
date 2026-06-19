@@ -228,7 +228,7 @@ label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-
 .modal-footer {
     border-top: 1px solid var(--border); flex-shrink: 0;
     position: sticky; bottom: 0; background: #1e1e1e; z-index: 2;
-    pointer-events: auto;
+    pointer-events: auto; border-radius: 0 0 16px 16px;
 }
 .modal-footer .btn { pointer-events: auto !important; }
 
