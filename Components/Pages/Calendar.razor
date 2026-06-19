@@ -1,0 +1,114 @@
+@page "/calendar"
+@inject IMatchService MatchService
+
+<PageTitle>Calendario — Le Stelle 3x3</PageTitle>
+
+<div class="mb-4">
+    <h1 class="section-title">CALENDARIO PARTITE</h1>
+    <p class="section-subtitle mb-0">Vista mensile del calendario partite</p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-icon" @onclick="PrevMonth">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <span class="text-headline-md text-primary">@currentMonth.ToString("MMMM yyyy").ToUpper()</span>
+        <button class="btn btn-icon" @onclick="NextMonth">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+    </div>
+</div>
+
+<div class="card-stat">
+    <div class="calendar-grid">
+        @foreach (var dayName in dayNames)
+        {
+            <div class="calendar-header">@dayName</div>
+        }
+        @for (int i = 0; i < firstDayOffset; i++)
+        {
+            <div class="calendar-day" style="background:transparent;border:none"></div>
+        }
+        @for (int day = 1; day <= daysInMonth; day++)
+        {
+            var date = new DateTime(currentMonth.Year, currentMonth.Month, day);
+            var dayMatches = calendarMatches.Where(m => m.DateTime.Date == date.Date).ToList();
+            var isToday = date.Date == DateTime.Today;
+
+            <div class="calendar-day @(isToday ? "today" : "") @(dayMatches.Any() ? "has-match" : "")"
+                 @onclick="() => ShowDay(date)">
+                <div class="day-num">@day</div>
+                @foreach (var m in dayMatches.Take(2))
+                {
+                    <div class="text-label-caps" style="font-size:8px;color:var(--primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                        <span class="match-dot"></span>VS @m.Opponent
+                    </div>
+                }
+                @if (dayMatches.Count > 2)
+                {
+                    <div class="text-label-caps" style="font-size:8px;color:var(--secondary)">+@(dayMatches.Count - 2) altre</div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@if (selectedDayMatches.Any())
+{
+    <div class="card-stat mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="section-title fs-5 mb-0">PARTITE DEL @selectedDate?.ToString("dd MMMM yyyy").ToUpper()</h4>
+            <button class="btn btn-sm btn-secondary" @onclick="() => selectedDate = null">CHIUDI</button>
+        </div>
+        @foreach (var m in selectedDayMatches)
+        {
+            <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                <div>
+                    <span class="text-label-caps text-secondary">@m.DateTime.ToString("HH:mm")</span>
+                    <span class="fw-bold ms-3">VS @m.Opponent</span>
+                    <span class="badge-status-scheduled ms-2">@m.TypeDisplay</span>
+                </div>
+                <div>
+                    @if (m.Status == MatchStatus.Played)
+                    {
+                        <span class="fw-bold">@m.ResultDisplay</span>
+                        if (m.IsVictory) { <span class="badge-victory ms-1">V</span> }
+                        else { <span class="badge-defeat ms-1">S</span> }
+                    }
+                    else
+                    {
+                        <span class="badge-status-scheduled">@m.StatusDisplay</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private DateTime currentMonth;
+    private List<Match> calendarMatches = new();
+    private DateTime? selectedDate;
+    private List<Match> selectedDayMatches = new();
+    private static readonly string[] dayNames = { "LUN", "MAR", "MER", "GIO", "VEN", "SAB", "DOM" };
+
+    private int daysInMonth => DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
+    private int firstDayOffset =>
+        ((int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek + 6) % 7;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        calendarMatches = await MatchService.GetAllAsync();
+    }
+
+    private void PrevMonth() { currentMonth = currentMonth.AddMonths(-1); }
+    private void NextMonth() { currentMonth = currentMonth.AddMonths(1); }
+
+    private void ShowDay(DateTime date)
+    {
+        selectedDate = date;
+        selectedDayMatches = calendarMatches.Where(m => m.DateTime.Date == date.Date).ToList();
+    }
+}

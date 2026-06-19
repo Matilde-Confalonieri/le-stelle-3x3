@@ -1,0 +1,68 @@
+@inject IMatchService MatchService
+@inject IPlayerService PlayerService
+@inject IPlaybookService PlaybookService
+@inject NavigationManager Nav
+
+<div class="search-container d-none d-md-flex">
+    <span class="material-symbols-outlined search-icon">search</span>
+    <input class="search-input" type="text" placeholder="Cerca..." @bind="SearchQuery"
+           @onkeyup="HandleKeyUp" />
+    @if (showResults && results.Any())
+    {
+        <div class="search-results">
+            @foreach (var result in results)
+            {
+                <div class="search-result-item" @onclick="() => NavigateTo(result.Link)" @onclick:preventDefault>
+                    <span class="material-symbols-outlined me-2">@result.Icon</span>
+                    <div>
+                        <div class="text-sm fw-bold">@result.Title</div>
+                        <div class="text-xs text-muted">@result.Subtitle</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private string SearchQuery = string.Empty;
+    private bool showResults;
+    private List<(string Title, string Subtitle, string Icon, string Link)> results = new();
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery) || SearchQuery.Length < 2)
+        {
+            showResults = false;
+            return;
+        }
+
+        if (e.Key == "Enter")
+        {
+            showResults = false;
+            return;
+        }
+
+        results.Clear();
+
+        var players = await PlayerService.SearchAsync(SearchQuery);
+        foreach (var p in players.Take(3))
+            results.Add((p.FullName, $"#{p.JerseyNumber}", "person", $"/roster"));
+
+        var matches = await MatchService.GetAllAsync();
+        foreach (var m in matches.Where(x => x.Opponent.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)).Take(3))
+            results.Add((m.Opponent, m.TypeDisplay, "sports_basketball", $"/matches"));
+
+        var schemes = await PlaybookService.SearchAsync(SearchQuery);
+        foreach (var s in schemes.Take(3))
+            results.Add((s.Name, s.CategoryDisplay, "menu_book", $"/playbook"));
+
+        showResults = results.Any();
+    }
+
+    private void NavigateTo(string link)
+    {
+        showResults = false;
+        Nav.NavigateTo(link);
+    }
+}

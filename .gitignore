@@ -1,0 +1,7 @@
+bin/
+obj/
+tournament.db
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+*.user
+.vs/

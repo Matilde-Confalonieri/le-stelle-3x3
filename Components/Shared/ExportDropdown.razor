@@ -1,0 +1,48 @@
+@inject ExportService ExportService
+@inject IJSRuntime JS
+
+<div class="dropdown d-inline-block">
+    <button class="btn btn-sm btn-outline-light dropdown-toggle text-label-caps" type="button" data-bs-toggle="dropdown">
+        Esporta CSV
+    </button>
+    <ul class="dropdown-menu dropdown-menu-dark">
+        <li><button class="dropdown-item" @onclick="() => ExportAsync(ExportType.Roster)">Roster</button></li>
+        <li><button class="dropdown-item" @onclick="() => ExportAsync(ExportType.Matches)">Calendario Partite</button></li>
+        <li><button class="dropdown-item" @onclick="() => ExportAsync(ExportType.Stats)">Statistiche</button></li>
+        <li><button class="dropdown-item" @onclick="() => ExportAsync(ExportType.Scorers)">Classifica Marcatori</button></li>
+    </ul>
+</div>
+
+@code {
+    private enum ExportType { Roster, Matches, Stats, Scorers }
+
+    private async Task ExportAsync(ExportType type)
+    {
+        byte[] data;
+        string filename;
+
+        switch (type)
+        {
+            case ExportType.Roster:
+                data = await ExportService.ExportRosterCsvAsync();
+                filename = "roster.csv";
+                break;
+            case ExportType.Matches:
+                data = await ExportService.ExportMatchesCsvAsync();
+                filename = "calendario-partite.csv";
+                break;
+            case ExportType.Stats:
+                data = await ExportService.ExportStatsCsvAsync();
+                filename = "statistiche.csv";
+                break;
+            case ExportType.Scorers:
+                data = await ExportService.ExportScorersCsvAsync();
+                filename = "classifica-marcatori.csv";
+                break;
+            default:
+                return;
+        }
+
+        await JS.InvokeVoidAsync("downloadFile", filename, Convert.ToBase64String(data));
+    }
+}

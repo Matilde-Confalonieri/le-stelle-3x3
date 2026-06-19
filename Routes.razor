@@ -1,0 +1,17 @@
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not Found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div class="container py-5 text-center">
+                <span class="material-symbols-outlined display-1 text-secondary">sports_basketball</span>
+                <h1 class="display-4 mt-3">404 — Pagina non trovata</h1>
+                <p class="text-secondary mb-4">La pagina che stai cercando non esiste.</p>
+                <a href="/" class="btn btn-primary rounded-pill px-4">Torna alla Dashboard</a>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>

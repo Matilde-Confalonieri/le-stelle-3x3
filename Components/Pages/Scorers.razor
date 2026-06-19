@@ -1,0 +1,79 @@
+@page "/scorers"
+@inject IStatsService StatsService
+
+<PageTitle>Classifica Marcatori — Le Stelle 3x3</PageTitle>
+
+<div class="mb-4">
+    <h1 class="section-title">CLASSIFICA MARCATORI</h1>
+    <p class="section-subtitle mb-0">Top scorer e classifiche complete</p>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="card-stat p-0">
+        <div class="p-4 border-bottom bg-secondary text-white">
+            <h4 class="text-label-caps mb-0">TOP SCORER — PUNTI TOTALI</h4>
+        </div>
+        <div class="table-responsive">
+            <table class="table-stats mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:60px">POS</th>
+                        <th>Giocatore</th>
+                        <th>Ruolo</th>
+                        <th>GP</th>
+                        <th>PTS Totali</th>
+                        <th>Media PTS</th>
+                        <th>RIM</th>
+                        <th>AST</th>
+                        <th>Eval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < rankings.Count; i++)
+                    {
+                        var s = rankings[i];
+                        <tr class="@(i == 0 ? "highlight-row" : "")">
+                            <td>
+                                @if (i == 0) { <span class="badge-mvp">1°</span> }
+                                else if (i == 1) { <span class="badge-mvp">2°</span> }
+                                else if (i == 2) { <span class="badge-mvp">3°</span> }
+                                else { <span>@(i + 1)°</span> }
+                            </td>
+                            <td class="fw-bold">@s.PlayerName</td>
+                            <td>#@s.JerseyNumber</td>
+                            <td>@s.GamesPlayed</td>
+                            <td class="fw-bold text-primary">@s.TotalPoints</td>
+                            <td>@s.AvgPoints.ToString("F1")</td>
+                            <td>@seasonStatsDict[s.PlayerId].TotalRebounds</td>
+                            <td>@seasonStatsDict[s.PlayerId].TotalAssists</td>
+                            <td class="fw-bold">@seasonStatsDict[s.PlayerId].AvgEval.ToString("F1")</td>
+                        </tr>
+                    }
+                    @if (!rankings.Any())
+                    {
+                        <tr><td colspan="9" class="text-center text-muted py-4">Nessun dato disponibile</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    private bool loading = true;
+    private List<ScorerRanking> rankings = new();
+    private Dictionary<int, PlayerSeasonStats> seasonStatsDict = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        rankings = await StatsService.GetScorerRankingsAsync();
+        var allSeason = await StatsService.GetSeasonStatsAsync();
+        seasonStatsDict = allSeason.ToDictionary(s => s.PlayerId);
+        loading = false;
+    }
+}

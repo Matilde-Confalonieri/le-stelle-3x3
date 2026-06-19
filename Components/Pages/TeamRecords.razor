@@ -1,0 +1,170 @@
+@page "/team-records"
+@inject IMatchService MatchService
+@inject IStatsService StatsService
+@inject IPlayerService PlayerService
+
+<PageTitle>Record Squadra — Le Stelle 3x3</PageTitle>
+
+<div class="mb-4">
+    <h1 class="section-title">RECORD DELLA SQUADRA</h1>
+    <p class="section-subtitle mb-0">Statistiche avanzate e primati</p>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card-stat">
+                <span class="stat-label">Miglior Vittoria</span>
+                <span class="stat-value text-primary">+@records.BestWin</span>
+                <p class="text-label-caps text-secondary mt-2 mb-0" style="font-size:9px">VS @records.BestWinOpponent</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card-stat">
+                <span class="stat-label">Peggior Sconfitta</span>
+                <span class="stat-value text-error">@records.WorstLoss</span>
+                <p class="text-label-caps text-secondary mt-2 mb-0" style="font-size:9px">VS @records.WorstLossOpponent</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card-stat">
+                <span class="stat-label">Max Punti in una Partita</span>
+                <span class="stat-value text-tertiary">@records.MaxPoints</span>
+                <p class="text-label-caps text-secondary mt-2 mb-0" style="font-size:9px">VS @records.MaxPointsOpponent</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card-stat">
+                <span class="stat-label">Min Punti in una Partita</span>
+                <span class="stat-value">@records.MinPoints</span>
+                <p class="text-label-caps text-secondary mt-2 mb-0" style="font-size:9px">VS @records.MinPointsOpponent</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-3">
+        <div class="col-lg-6">
+            <div class="card-stat">
+                <h4 class="section-title fs-5 mb-3">ULTIME 5 PARTITE</h4>
+                <canvas id="lastFiveChart"></canvas>
+                <div class="d-flex gap-2 mt-3 flex-wrap">
+                    @for (int i = 0; i < lastFive.Count; i++)
+                    {
+                        var m = lastFive[i];
+                        <span class="d-flex align-items-center gap-1">
+                            <span class="@(m.IsVictory ? "badge-victory" : "badge-defeat")">
+                                @(m.IsVictory ? "V" : "S") (@m.OurPoints-@m.TheirPoints)
+                            </span>
+                            <span class="text-label-caps" style="font-size:9px">VS @m.Opponent</span>
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card-stat">
+                <h4 class="section-title fs-5 mb-3">TOP PERFORMERS</h4>
+                <div class="row g-3">
+                    @if (bestScorer != null)
+                    {
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 p-2">
+                                <span class="material-symbols-outlined text-primary">local_fire_department</span>
+                                <div>
+                                    <span class="text-label-caps text-secondary d-block">MIGLIOR MARCATORE</span>
+                                    <span class="fw-bold">@bestScorer.PlayerName — @bestScorer.TotalPoints PTS (@bestScorer.AvgPoints.ToString("F1") AVG)</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (bestRebounder != null)
+                    {
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 p-2">
+                                <span class="material-symbols-outlined text-secondary">stat_2</span>
+                                <div>
+                                    <span class="text-label-caps text-secondary d-block">MIGLIOR RIMBALZISTA</span>
+                                    <span class="fw-bold">@bestRebounder.PlayerName — @bestRebounder.TotalRebounds RIM (@bestRebounder.AvgRebounds.ToString("F1") RPG)</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (bestAssistman != null)
+                    {
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-3 p-2">
+                                <span class="material-symbols-outlined text-tertiary">handshake</span>
+                                <div>
+                                    <span class="text-label-caps text-secondary d-block">MIGLIOR ASSISTMAN</span>
+                                    <span class="fw-bold">@bestAssistman.PlayerName — @bestAssistman.TotalAssists AST (@bestAssistman.AvgAssists.ToString("F1") APG)</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-3">
+        <div class="col-12">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">DISTRIBUZIONE TIPI PARTITA</h4>
+                <canvas id="matchTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool loading = true;
+    private List<Match> lastFive = new();
+    private ScorerRanking? bestScorer;
+    private PlayerSeasonStats? bestRebounder;
+    private PlayerSeasonStats? bestAssistman;
+    private (int BestWin, string BestWinOpponent, string WorstLoss, string WorstLossOpponent, int MaxPoints, string MaxPointsOpponent, int MinPoints, string MinPointsOpponent) records;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allMatches = await MatchService.GetAllAsync();
+        var played = allMatches.Where(m => m.Status == MatchStatus.Played).OrderByDescending(m => m.DateTime).ToList();
+        lastFive = played.Take(5).Reverse().ToList();
+
+        if (played.Any())
+        {
+            var bestWinMatch = played.Where(m => m.IsVictory).OrderByDescending(m => m.OurPoints - m.TheirPoints).FirstOrDefault();
+            var worstLossMatch = played.Where(m => !m.IsVictory).OrderByDescending(m => m.TheirPoints - m.OurPoints).FirstOrDefault();
+            var maxPts = played.OrderByDescending(m => m.OurPoints).First();
+            var minPts = played.OrderBy(m => m.OurPoints).First();
+
+            records = (
+                BestWin: bestWinMatch != null ? bestWinMatch.OurPoints - bestWinMatch.TheirPoints : 0,
+                BestWinOpponent: bestWinMatch?.Opponent ?? "—",
+                WorstLoss: worstLossMatch != null ? $"-{worstLossMatch.TheirPoints - worstLossMatch.OurPoints}" : "—",
+                WorstLossOpponent: worstLossMatch?.Opponent ?? "—",
+                MaxPoints: maxPts?.OurPoints ?? 0,
+                MaxPointsOpponent: maxPts?.Opponent ?? "—",
+                MinPoints: minPts?.OurPoints ?? 0,
+                MinPointsOpponent: minPts?.Opponent ?? "—"
+            );
+        }
+
+        var rankings = await StatsService.GetScorerRankingsAsync();
+        bestScorer = rankings.FirstOrDefault();
+
+        var seasonStats = await StatsService.GetSeasonStatsAsync();
+        bestRebounder = seasonStats.OrderByDescending(s => s.TotalRebounds).FirstOrDefault();
+        bestAssistman = seasonStats.OrderByDescending(s => s.TotalAssists).FirstOrDefault();
+
+        loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+    }
+}

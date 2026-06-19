@@ -1,0 +1,131 @@
+@page "/tournament"
+@inject IMatchService MatchService
+
+<PageTitle>Classifica Torneo — Le Stelle 3x3</PageTitle>
+
+<div class="mb-4">
+    <h1 class="section-title">CLASSIFICA TORNEO</h1>
+    <p class="section-subtitle mb-0">Calcolata automaticamente in base ai risultati</p>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="card-stat p-0">
+        <div class="p-4 border-bottom bg-secondary text-white">
+            <h4 class="text-label-caps mb-0">POSIZIONI IN CLASSIFICA</h4>
+        </div>
+        <div class="table-responsive">
+            <table class="table-stats mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:60px">Pos</th>
+                        <th>Squadra</th>
+                        <th>GP</th>
+                        <th>V</th>
+                        <th>S</th>
+                        <th>PF</th>
+                        <th>PS</th>
+                        <th>Diff</th>
+                        <th>Win%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td><span class="badge-mvp">1</span></td>
+                        <td class="fw-bold">LE STELLE 3x3</td>
+                        <td>@standings.GamesPlayed</td>
+                        <td class="fw-bold text-primary">@standings.Wins</td>
+                        <td>@standings.Losses</td>
+                        <td class="fw-bold">@standings.PointsFor</td>
+                        <td>@standings.PointsAgainst</td>
+                        <td class="@(standings.Diff >= 0 ? "text-tertiary fw-bold" : "text-error fw-bold")">@(standings.Diff >= 0 ? "+" : "")@standings.Diff</td>
+                        <td>@standings.WinPercentage%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">VITTORIE / SCONFITTE</h4>
+                <canvas id="winLossChart"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">PUNTI FATTI vs SUBITI</h4>
+                <canvas id="ptsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <div class="card-stat">
+            <h4 class="section-title fs-5 mb-3">RIEPILOGO PARTITE</h4>
+            <div class="table-responsive">
+                <table class="table-stats mb-0">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Avversario</th>
+                            <th>Tipo</th>
+                            <th>Risultato</th>
+                            <th>Esito</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in playedMatches)
+                        {
+                            <tr>
+                                <td class="text-label-caps">@m.DateTime.ToString("dd/MM/yyyy")</td>
+                                <td class="fw-bold">@m.Opponent</td>
+                                <td>@m.TypeDisplay</td>
+                                <td class="fw-bold">@m.OurPoints - @m.TheirPoints</td>
+                                <td>
+                                    @if (m.IsVictory)
+                                    { <span class="badge-victory">VITTORIA</span> }
+                                    else
+                                    { <span class="badge-defeat">SCONFITTA</span> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool loading = true;
+    private List<Match> playedMatches = new();
+    private (int GamesPlayed, int Wins, int Losses, int PointsFor, int PointsAgainst, int Diff, double WinPercentage) standings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var all = await MatchService.GetAllAsync();
+        playedMatches = all.Where(m => m.Status == MatchStatus.Played).OrderByDescending(m => m.DateTime).ToList();
+
+        standings = (
+            GamesPlayed: playedMatches.Count,
+            Wins: playedMatches.Count(m => m.IsVictory),
+            Losses: playedMatches.Count(m => !m.IsVictory),
+            PointsFor: playedMatches.Sum(m => m.OurPoints),
+            PointsAgainst: playedMatches.Sum(m => m.TheirPoints),
+            Diff: playedMatches.Sum(m => m.OurPoints) - playedMatches.Sum(m => m.TheirPoints),
+            WinPercentage: playedMatches.Count > 0 ? Math.Round((double)playedMatches.Count(m => m.IsVictory) / playedMatches.Count * 100, 1) : 0
+        );
+
+        loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+    }
+}

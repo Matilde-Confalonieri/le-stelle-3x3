@@ -1,0 +1,85 @@
+@inherits LayoutComponentBase
+
+<div class="app-layout">
+    @if (sidebarOpen)
+    {
+        <div class="sidebar-overlay" @onclick="() => sidebarOpen = false"></div>
+    }
+    <div class="sidebar-mobile @(sidebarOpen ? "open" : "") d-lg-none">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">3X3</div>
+            <div class="sidebar-brand-text">
+                <div class="text-label-sm">LE STELLE</div>
+                <div class="text-stat">3X3</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <NavLink class="sidebar-link" href="/" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">dashboard</span><span>Dashboard</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/matches" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">sports_basketball</span><span>Partite</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/update-stats" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">edit_note</span><span>Aggiorna Stats</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/roster" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">group</span><span>Roster</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/statistics" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">leaderboard</span><span>Statistiche</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/tournament" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">emoji_events</span><span>Classifica</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/scorers" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">local_fire_department</span><span>Marcatori</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/playbook" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">menu_book</span><span>Schemi</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/rules" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">gavel</span><span>Regole</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/calendar" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">calendar_month</span><span>Calendario</span>
+            </NavLink>
+            <NavLink class="sidebar-link" href="/team-records" @onclick="CloseMenu">
+                <span class="material-symbols-outlined">trophy</span><span>Record</span>
+            </NavLink>
+        </nav>
+    </div>
+
+    <NavMenu />
+    <main class="main-content">
+        <header class="top-app-bar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-icon d-lg-none" @onclick="ToggleMobileMenu">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <h2 class="top-bar-title">LE STELLE 3X3</h2>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <GlobalSearch />
+            </div>
+        </header>
+        <div class="content-area mesh-overlay-parent">
+            <div class="mesh-overlay"></div>
+            <div class="content-inner">
+                @Body
+            </div>
+        </div>
+        <footer class="app-footer">
+            <span class="text-label-caps">&copy; 2024 LE STELLE 3x3</span>
+            <div class="d-flex gap-4"><ExportDropdown /></div>
+            <div class="text-headline-sm text-secondary">LE STELLE</div>
+        </footer>
+    </main>
+</div>
+
+@code {
+    private bool sidebarOpen;
+
+    private void ToggleMobileMenu() => sidebarOpen = !sidebarOpen;
+    private void CloseMenu() => sidebarOpen = false;
+}

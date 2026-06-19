@@ -1,0 +1,172 @@
+@page "/roster"
+@inject IPlayerService PlayerService
+
+<PageTitle>Roster — Le Stelle 3x3</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="section-title">ROSTER</h1>
+        <p class="section-subtitle mb-0">Gestione giocatrici della squadra</p>
+    </div>
+    <button class="btn btn-primary" @onclick="OpenAdd">
+        <span class="material-symbols-outlined align-middle me-1">person_add</span> NUOVA GIOCATRICE
+    </button>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var player in players)
+        {
+            var totalPts = player.MatchStats.Sum(s => s.Points);
+            var games = player.MatchStats.Select(s => s.MatchId).Distinct().Count();
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card-player">
+                    <div class="position-relative mx-auto mb-3" style="width:96px">
+                        <div class="avatar avatar-lg d-flex align-items-center justify-content-center bg-primary text-white">
+                            @player.FirstName[..1]@player.LastName[..1]
+                        </div>
+                        <div class="position-absolute bottom-0 end-0 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                             style="width:32px;height:32px;font-family:var(--font-display);font-weight:800;font-size:16px;border:2px solid white">
+                            @player.JerseyNumber
+                        </div>
+                    </div>
+                    <h5 class="text-headline-sm mb-1">@player.FullName</h5>
+                    <p class="text-label-caps text-secondary mb-3">#@player.JerseyNumber</p>
+                    <div class="d-flex justify-content-center gap-3 mb-3">
+                        <div>
+                            <span class="text-stat-value text-primary d-block">@totalPts</span>
+                            <span class="text-label-caps text-secondary" style="font-size:8px">PTS</span>
+                        </div>
+                        <div>
+                            <span class="text-stat-value d-block">@games</span>
+                            <span class="text-label-caps text-secondary" style="font-size:8px">GP</span>
+                        </div>
+                        @if (games > 0)
+                        {
+                            <div>
+                                <span class="text-stat-value text-tertiary d-block">@((double)totalPts / games).ToString("F1")</span>
+                                <span class="text-label-caps text-secondary" style="font-size:8px">AVG</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenEdit(player)">
+                            <span class="material-symbols-outlined" style="font-size:18px">edit</span>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(player)">
+                            <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow:12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">@(isEditing ? "Modifica Giocatrice" : "Nuova Giocatrice")</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-label-caps text-secondary">Nome</label>
+                            <InputText class="form-control urban-input" @bind-Value="form.FirstName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-label-caps text-secondary">Cognome</label>
+                            <InputText class="form-control urban-input" @bind-Value="form.LastName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-label-caps text-secondary">Numero Maglia</label>
+                            <InputNumber class="form-control urban-input" @bind-Value="form.JerseyNumber" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-label-caps text-secondary">Foto</label>
+                            <InputFile class="form-control urban-input" OnChange="OnPhotoSelected" accept="image/*" />
+                            @if (!string.IsNullOrEmpty(form.PhotoUrl))
+                            {
+                                <p class="text-sm text-muted mt-1">Foto attuale: @form.PhotoUrl</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="CloseModal">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="SavePlayer" disabled="@(string.IsNullOrWhiteSpace(form.FirstName) || string.IsNullOrWhiteSpace(form.LastName))">SALVA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteModal)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow:12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">Conferma Eliminazione</h5>
+                </div>
+                <div class="modal-body"><p>Eliminare <strong>@deleteTarget?.FullName</strong>? Verranno rimosse anche le sue statistiche.</p></div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="() => showDeleteModal = false">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="DeletePlayer">ELIMINA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool loading = true;
+    private List<Player> players = new();
+    private bool showModal, showDeleteModal, isEditing;
+    private Player form = new();
+    private Player? deleteTarget;
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+    private async Task LoadData() { players = await PlayerService.GetAllAsync(); loading = false; }
+
+    private void OpenAdd() { isEditing = false; form = new Player(); showModal = true; }
+    private void OpenEdit(Player p) { isEditing = true; form = new Player { Id = p.Id, FirstName = p.FirstName, LastName = p.LastName, JerseyNumber = p.JerseyNumber, PhotoUrl = p.PhotoUrl }; showModal = true; }
+    private void CloseModal() { showModal = false; }
+
+    private async Task OnPhotoSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        Directory.CreateDirectory(uploadsDir);
+        var uniqueName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+        var filePath = Path.Combine(uploadsDir, uniqueName);
+        await using var stream = File.Create(filePath);
+        await file.OpenReadStream(5 * 1024 * 1024).CopyToAsync(stream);
+        form.PhotoUrl = $"/uploads/{uniqueName}";
+    }
+
+    private async Task SavePlayer()
+    {
+        if (isEditing) await PlayerService.UpdateAsync(form);
+        else await PlayerService.AddAsync(form);
+        showModal = false; await LoadData();
+    }
+
+    private void ConfirmDelete(Player p) { deleteTarget = p; showDeleteModal = true; }
+    private async Task DeletePlayer()
+    {
+        if (deleteTarget != null) await PlayerService.DeleteAsync(deleteTarget.Id);
+        showDeleteModal = false; deleteTarget = null; await LoadData();
+    }
+}

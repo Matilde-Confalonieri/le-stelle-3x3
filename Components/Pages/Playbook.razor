@@ -1,0 +1,229 @@
+@page "/playbook"
+@inject IPlaybookService PlaybookService
+@inject IJSRuntime JS
+
+<PageTitle>Schemi — Le Stelle 3x3</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="section-title">SCHEMI DI GIOCO</h1>
+        <p class="section-subtitle mb-0">Archivio schemi offensivi, difensivi e situazioni speciali</p>
+    </div>
+    <button class="btn btn-primary" @onclick="OpenAdd">
+        <span class="material-symbols-outlined align-middle me-1">add</span> NUOVO SCHEMA
+    </button>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="d-flex align-items-center gap-3">
+            <label class="text-label-caps text-secondary mb-0">Categoria</label>
+            <select class="form-select urban-input w-auto" @bind="filterCategory" @bind:after="ApplyFilter">
+                <option value="">Tutti</option>
+                <option value="Offense">Attacco</option>
+                <option value="Defense">Difesa</option>
+                <option value="Inbound">Rimessa</option>
+                <option value="Special">Situazione Speciale</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="search-container">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input class="search-input" type="text" placeholder="Cerca schemi..." @bind="searchQuery"
+                   @bind:event="oninput" @bind:after="ApplyFilter" style="width:100%" />
+        </div>
+    </div>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var scheme in filteredSchemes)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card-scheme">
+                    @if (!string.IsNullOrEmpty(scheme.ImageUrl))
+                    {
+                        <div class="scheme-image-container" style="height:200px;overflow:hidden;background:var(--surface-container)">
+                            <img src="@scheme.ImageUrl" alt="@scheme.Name" style="width:100%;height:100%;object-fit:cover" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center bg-surface-container" style="height:120px">
+                            <span class="material-symbols-outlined display-4 text-secondary">strategy</span>
+                        </div>
+                    }
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="text-headline-sm mb-0">@scheme.Name</h5>
+                            <span class="badge-status-scheduled">@scheme.CategoryDisplay</span>
+                        </div>
+                        <p class="text-body-sm text-secondary mb-3">@scheme.Description</p>
+                        @if (!string.IsNullOrEmpty(scheme.Notes))
+                        {
+                            <p class="text-label-caps text-secondary mb-3" style="font-weight:400;letter-spacing:0">@scheme.Notes</p>
+                        }
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => OpenEdit(scheme)">
+                                <span class="material-symbols-outlined" style="font-size:18px">edit</span> Modifica
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(scheme)">
+                                <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!filteredSchemes.Any())
+        {
+            <div class="col-12 text-center text-muted py-5">Nessuno schema trovato</div>
+        }
+    </div>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow: 12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">@(isEditing ? "Modifica Schema" : "Nuovo Schema")</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="text-label-caps text-secondary">Nome Schema</label>
+                            <InputText class="form-control urban-input" @bind-Value="form.Name" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-label-caps text-secondary">Categoria</label>
+                            <select class="form-select urban-input" @bind="formCategory">
+                                <option value="Offense">Attacco</option>
+                                <option value="Defense">Difesa</option>
+                                <option value="Inbound">Rimessa</option>
+                                <option value="Special">Situazione Speciale</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-label-caps text-secondary">Carica Immagine</label>
+                            <InputFile class="form-control urban-input" OnChange="OnFileSelected" accept="image/*" />
+                            @if (!string.IsNullOrEmpty(form.ImageUrl))
+                            {
+                                <p class="text-sm text-secondary mt-1">Immagine attuale: @form.ImageUrl</p>
+                            }
+                            @if (uploading) { <div class="spinner-border spinner-border-sm text-primary mt-2"></div> }
+                        </div>
+                        <div class="col-12">
+                            <label class="text-label-caps text-secondary">Descrizione Dettagliata</label>
+                            <textarea class="form-control urban-input" rows="4" @bind="form.Description"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-label-caps text-secondary">Note Aggiuntive</label>
+                            <textarea class="form-control urban-input" rows="2" @bind="form.Notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="CloseModal">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="SaveScheme" disabled="@(string.IsNullOrWhiteSpace(form.Name))">SALVA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteModal)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow: 12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">Conferma Eliminazione</h5>
+                </div>
+                <div class="modal-body"><p>Eliminare lo schema <strong>@deleteTarget?.Name</strong>?</p></div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="() => showDeleteModal = false">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="DeleteScheme">ELIMINA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool loading = true;
+    private List<PlaybookScheme> allSchemes = new();
+    private List<PlaybookScheme> filteredSchemes = new();
+    private string filterCategory = "";
+    private string searchQuery = "";
+    private bool showModal;
+    private bool showDeleteModal;
+    private bool isEditing;
+    private bool uploading;
+    private PlaybookScheme form = new();
+    private PlaybookScheme? deleteTarget;
+    private string formCategory = "Offense";
+
+    protected override async Task OnInitializedAsync() { await LoadData(); }
+    private async Task LoadData() { allSchemes = await PlaybookService.GetAllAsync(); filteredSchemes = allSchemes; loading = false; }
+
+    private void ApplyFilter()
+    {
+        var query = allSchemes.AsEnumerable();
+        if (!string.IsNullOrEmpty(filterCategory))
+            query = query.Where(s => s.Category.ToString() == filterCategory);
+        if (!string.IsNullOrEmpty(searchQuery))
+            query = query.Where(s => s.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) || s.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+        filteredSchemes = query.ToList();
+    }
+
+    private void OpenAdd() { isEditing = false; form = new PlaybookScheme(); formCategory = "Offense"; showModal = true; }
+    private void OpenEdit(PlaybookScheme s) { isEditing = true; form = new PlaybookScheme { Id = s.Id, Name = s.Name, Category = s.Category, Description = s.Description, Notes = s.Notes, ImageUrl = s.ImageUrl }; formCategory = s.Category.ToString(); showModal = true; }
+    private void CloseModal() { showModal = false; }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+        uploading = true;
+        try
+        {
+            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            Directory.CreateDirectory(uploadsDir);
+            var uniqueName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+            var filePath = Path.Combine(uploadsDir, uniqueName);
+            await using var stream = File.Create(filePath);
+            await file.OpenReadStream(5 * 1024 * 1024).CopyToAsync(stream);
+            form.ImageUrl = $"/uploads/{uniqueName}";
+        }
+        finally { uploading = false; }
+    }
+
+    private async Task SaveScheme()
+    {
+        form.Category = Enum.Parse<SchemeCategory>(formCategory);
+        if (isEditing) await PlaybookService.UpdateAsync(form);
+        else await PlaybookService.AddAsync(form);
+        showModal = false;
+        await LoadData();
+        ApplyFilter();
+    }
+
+    private void ConfirmDelete(PlaybookScheme s) { deleteTarget = s; showDeleteModal = true; }
+
+    private async Task DeleteScheme()
+    {
+        if (deleteTarget != null) await PlaybookService.DeleteAsync(deleteTarget.Id);
+        showDeleteModal = false; deleteTarget = null;
+        await LoadData();
+        ApplyFilter();
+    }
+}

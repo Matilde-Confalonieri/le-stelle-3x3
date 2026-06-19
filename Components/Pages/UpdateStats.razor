@@ -1,0 +1,204 @@
+@page "/update-stats"
+@inject IMatchService MatchService
+@inject IPlayerService PlayerService
+@inject IStatsService StatsService
+
+<PageTitle>Aggiorna Statistiche — Le Stelle 3x3</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="section-title">AGGIORNA STATISTICHE</h1>
+        <p class="section-subtitle mb-0">Inserisci le statistiche dei giocatori per partita</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card-stat">
+            <div class="mb-3">
+                <label class="text-label-caps text-secondary">Giocatore</label>
+                <select class="form-select urban-input" @bind="selectedPlayerId">
+                    <option value="0">Seleziona giocatore...</option>
+                    @foreach (var p in players)
+                    {
+                        <option value="@p.Id">@p.FullName</option>
+                    }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="text-label-caps text-secondary">Partita</label>
+                <select class="form-select urban-input" @bind="selectedMatchId">
+                    <option value="0">Seleziona partita...</option>
+                    @foreach (var m in matches)
+                    {
+                        <option value="@m.Id">VS @m.Opponent — @m.DateTime.ToString("dd/MM HH:mm")</option>
+                    }
+                </select>
+            </div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="text-label-caps text-secondary">Punti</label>
+                    <InputNumber class="form-control urban-input" @bind-Value="form.Points" />
+                </div>
+                <div class="col-6">
+                    <label class="text-label-caps text-secondary">Rimbalzi</label>
+                    <InputNumber class="form-control urban-input" @bind-Value="form.Rebounds" />
+                </div>
+                <div class="col-6">
+                    <label class="text-label-caps text-secondary">Assist</label>
+                    <InputNumber class="form-control urban-input" @bind-Value="form.Assists" />
+                </div>
+                <div class="col-6">
+                    <label class="text-label-caps text-secondary">Recuperi</label>
+                    <InputNumber class="form-control urban-input" @bind-Value="form.Steals" />
+                </div>
+                <div class="col-6">
+                    <label class="text-label-caps text-secondary">Stoppate</label>
+                    <InputNumber class="form-control urban-input" @bind-Value="form.Blocks" />
+                </div>
+                <div class="col-6">
+                    <label class="text-label-caps text-secondary">Falli</label>
+                    <InputNumber class="form-control urban-input" @bind-Value="form.Fouls" />
+                </div>
+            </div>
+            <button class="btn btn-primary w-100 mt-3" @onclick="SaveStats" disabled="@(selectedPlayerId == 0 || selectedMatchId == 0)">
+                @(editingId > 0 ? "AGGIORNA STATS" : "INSERISCI STATS")
+            </button>
+            @if (editingId > 0)
+            {
+                <button class="btn btn-outline-secondary w-100 mt-2" @onclick="ResetForm">ANNULLA MODIFICA</button>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="table-responsive">
+            <table class="table-stats">
+                <thead>
+                    <tr>
+                        <th>Giocatore</th>
+                        <th>Partita</th>
+                        <th>PTS</th>
+                        <th>RIM</th>
+                        <th>AST</th>
+                        <th>REC</th>
+                        <th>STP</th>
+                        <th>FAL</th>
+                        <th>Eval</th>
+                        <th class="text-end">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in allStats)
+                    {
+                        <tr>
+                            <td class="fw-bold">@s.Player.FullName</td>
+                            <td class="text-sm">VS @s.Match.Opponent (@s.Match.DateTime.ToString("dd/MM"))</td>
+                            <td class="fw-bold">@s.Points</td>
+                            <td>@s.Rebounds</td>
+                            <td>@s.Assists</td>
+                            <td>@s.Steals</td>
+                            <td>@s.Blocks</td>
+                            <td>@s.Fouls</td>
+                            <td class="fw-bold">@s.Evaluation.ToString("F0")</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => EditStats(s)" title="Modifica">
+                                    <span class="material-symbols-outlined" style="font-size:18px">edit</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(s)" title="Elimina">
+                                    <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    @if (!allStats.Any())
+                    {
+                        <tr><td colspan="10" class="text-center text-muted py-4">Nessuna statistica inserita</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (showDeleteModal)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow: 12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">Conferma Eliminazione</h5>
+                </div>
+                <div class="modal-body"><p>Eliminare queste statistiche?</p></div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="() => showDeleteModal = false">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="DeleteStats">ELIMINA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Player> players = new();
+    private List<Match> matches = new();
+    private List<PlayerMatchStats> allStats = new();
+    private int selectedPlayerId;
+    private int selectedMatchId;
+    private int editingId;
+    private int deleteId;
+    private bool showDeleteModal;
+    private PlayerMatchStats form = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        players = await PlayerService.GetAllAsync();
+        matches = await MatchService.GetAllAsync();
+        allStats = await StatsService.GetAllStatsAsync();
+    }
+
+    private async Task SaveStats()
+    {
+        form.PlayerId = selectedPlayerId;
+        form.MatchId = selectedMatchId;
+        if (editingId > 0) form.Id = editingId;
+        await StatsService.AddOrUpdateStatsAsync(form);
+        ResetForm();
+        allStats = await StatsService.GetAllStatsAsync();
+    }
+
+    private void EditStats(PlayerMatchStats stats)
+    {
+        editingId = stats.Id;
+        selectedPlayerId = stats.PlayerId;
+        selectedMatchId = stats.MatchId;
+        form = new PlayerMatchStats
+        {
+            Points = stats.Points, Rebounds = stats.Rebounds,
+            Assists = stats.Assists, Steals = stats.Steals,
+            Blocks = stats.Blocks, Fouls = stats.Fouls,
+        };
+    }
+
+    private void ResetForm()
+    {
+        editingId = 0;
+        selectedPlayerId = 0;
+        selectedMatchId = 0;
+        form = new PlayerMatchStats();
+    }
+
+    private void ConfirmDelete(PlayerMatchStats stats)
+    {
+        deleteId = stats.Id;
+        showDeleteModal = true;
+    }
+
+    private async Task DeleteStats()
+    {
+        await StatsService.DeleteStatsAsync(deleteId);
+        showDeleteModal = false;
+        deleteId = 0;
+        allStats = await StatsService.GetAllStatsAsync();
+    }
+}

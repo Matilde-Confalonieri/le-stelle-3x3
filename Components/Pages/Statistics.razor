@@ -1,0 +1,219 @@
+@page "/statistics"
+@inject IStatsService StatsService
+@inject IMatchService MatchService
+@inject IPlayerService PlayerService
+
+<PageTitle>Statistiche — Le Stelle 3x3</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="section-title">STATISTICHE</h1>
+        <p class="section-subtitle mb-0">Statistiche dettagliate giocatori e partite</p>
+    </div>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <label class="text-label-caps text-secondary">Filtra per Giocatore</label>
+            <select class="form-select urban-input" @bind="filterPlayerId" @bind:after="ApplyFilters">
+                <option value="0">Tutti i giocatori</option>
+                @foreach (var p in players)
+                {
+                    <option value="@p.Id">@p.FullName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="text-label-caps text-secondary">Filtra per Partita</label>
+            <select class="form-select urban-input" @bind="filterMatchId" @bind:after="ApplyFilters">
+                <option value="0">Tutte le partite</option>
+                @foreach (var m in allMatches)
+                {
+                    <option value="@m.Id">VS @m.Opponent — @m.DateTime.ToString("dd/MM")</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card-stat p-0">
+                <div class="p-4 border-bottom bg-secondary text-white">
+                    <h4 class="text-label-caps mb-0">STATISTICHE PER PARTITA</h4>
+                </div>
+                <div class="table-responsive">
+                    <table class="table-stats mb-0">
+                        <thead>
+                            <tr>
+                                <th>Giocatore</th>
+                                <th>Partita</th>
+                                <th>PTS</th>
+                                <th>RIM</th>
+                                <th>AST</th>
+                                <th>REC</th>
+                                <th>STP</th>
+                                <th>FAL</th>
+                                <th>Eval</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in filteredStats)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@s.Player.FullName</td>
+                                    <td class="text-sm">VS @s.Match.Opponent</td>
+                                    <td class="fw-bold">@s.Points</td>
+                                    <td>@s.Rebounds</td>
+                                    <td>@s.Assists</td>
+                                    <td>@s.Steals</td>
+                                    <td>@s.Blocks</td>
+                                    <td>@s.Fouls</td>
+                                    <td class="fw-bold text-primary">@s.Evaluation.ToString("F0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <div class="col-12">
+            <div class="card-stat p-0">
+                <div class="p-4 border-bottom bg-secondary text-white">
+                    <h4 class="text-label-caps mb-0">CLASSIFICA TOTALE GIOCATORI</h4>
+                </div>
+                <div class="table-responsive">
+                    <table class="table-stats mb-0">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Giocatore</th>
+                                <th>Ruolo</th>
+                                <th>GP</th>
+                                <th>PTS</th>
+                                <th>AVG</th>
+                                <th>RIM</th>
+                                <th>RPG</th>
+                                <th>AST</th>
+                                <th>APG</th>
+                                <th>REC</th>
+                                <th>STP</th>
+                                <th>FAL</th>
+                                <th>Eval</th>
+                                <th>MVP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var rank = 1;
+                            }
+                            @foreach (var s in seasonStats.OrderByDescending(s => s.TotalPoints))
+                            {
+                                <tr class="@(rank == 1 ? "highlight-row" : "")">
+                                    <td>
+                                        @if (rank == 1) { <span class="badge-mvp">TOP</span> }
+                                        else { <span>@rank</span> }
+                                    </td>
+                                    <td class="fw-bold">@s.PlayerName</td>
+                                    <td>#@s.JerseyNumber</td>
+                                    <td>@s.GamesPlayed</td>
+                                    <td class="fw-bold">@s.TotalPoints</td>
+                                    <td>@s.AvgPoints.ToString("F1")</td>
+                                    <td>@s.TotalRebounds</td>
+                                    <td>@s.AvgRebounds.ToString("F1")</td>
+                                    <td>@s.TotalAssists</td>
+                                    <td>@s.AvgAssists.ToString("F1")</td>
+                                    <td>@s.TotalSteals</td>
+                                    <td>@s.TotalBlocks</td>
+                                    <td>@s.TotalFouls</td>
+                                    <td class="fw-bold text-primary">@s.AvgEval.ToString("F1")</td>
+                                    <td>—</td>
+                                </tr>
+                                rank++;
+                            }
+                            @if (!seasonStats.Any())
+                            {
+                                <tr><td colspan="15" class="text-center text-muted py-4">Nessun dato disponibile</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">MIGLIOR MARCATORE</h4>
+                <p class="section-subtitle">Punti totali per giocatore</p>
+                <canvas id="scorersChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">MIGLIOR RIMBALZISTA</h4>
+                <p class="section-subtitle">Rimbalzi totali per giocatore</p>
+                <canvas id="reboundsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">MIGLIOR ASSISTMAN</h4>
+                <p class="section-subtitle">Assist totali per giocatore</p>
+                <canvas id="assistsChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <h4 class="section-title fs-5">VALUTAZIONE MEDIA</h4>
+                <p class="section-subtitle">Media valutazione per giocatore</p>
+                <canvas id="evalChart"></canvas>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool loading = true;
+    private List<PlayerMatchStats> allStats = new();
+    private List<PlayerMatchStats> filteredStats = new();
+    private List<PlayerSeasonStats> seasonStats = new();
+    private List<Player> players = new();
+    private List<Match> allMatches = new();
+    private int filterPlayerId;
+    private int filterMatchId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allStats = await StatsService.GetAllStatsAsync();
+        filteredStats = allStats;
+        seasonStats = await StatsService.GetSeasonStatsAsync();
+        players = await PlayerService.GetAllAsync();
+        allMatches = await MatchService.GetAllAsync();
+        loading = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+    }
+
+    private async Task ApplyFilters()
+    {
+        var query = allStats.AsEnumerable();
+        if (filterPlayerId > 0) query = query.Where(s => s.PlayerId == filterPlayerId);
+        if (filterMatchId > 0) query = query.Where(s => s.MatchId == filterMatchId);
+        filteredStats = query.ToList();
+    }
+}

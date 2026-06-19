@@ -1,0 +1,212 @@
+@page "/matches"
+@inject IMatchService MatchService
+
+<PageTitle>Partite — Le Stelle 3x3</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="section-title">PARTITE</h1>
+        <p class="section-subtitle mb-0">Gestisci partite — Torneo 20 Giugno 2026</p>
+    </div>
+    <button class="btn btn-primary" @onclick="OpenAddMatch">
+        <span class="material-symbols-outlined align-middle me-1">add</span> NUOVA PARTITA
+    </button>
+</div>
+
+@if (loading)
+{
+    <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table-stats">
+            <thead>
+                <tr>
+                    <th>Orario</th>
+                    <th>Campo</th>
+                    <th>Avversario</th>
+                    <th>Tipo</th>
+                    <th>Stato</th>
+                    <th>Risultato</th>
+                    <th>MVP</th>
+                    <th class="text-end">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var match in matches)
+                {
+                    var mvp = match.PlayerStats.OrderByDescending(s => s.Evaluation).FirstOrDefault();
+                    <tr>
+                        <td class="text-label-caps fw-bold">@match.DateTime.ToString("HH:mm")</td>
+                        <td>@match.Location</td>
+                        <td class="fw-bold">@match.Opponent</td>
+                        <td>@match.TypeDisplay</td>
+                        <td>
+                            @if (match.Status == MatchStatus.Scheduled)
+                            { <span class="badge-status-scheduled">@match.StatusDisplay</span> }
+                            else
+                            { <span class="badge-status-played">@match.StatusDisplay</span> }
+                        </td>
+                        <td>
+                            @if (match.Status == MatchStatus.Played)
+                            {
+                                <span class="fw-bold">@match.ResultDisplay</span>
+                                if (match.IsVictory) { <span class="badge-victory ms-1">V</span> }
+                                else { <span class="badge-defeat ms-1">S</span> }
+                            }
+                            else { <span class="text-muted">—</span> }
+                        </td>
+                        <td>
+                            @if (mvp != null) { <span class="badge-mvp">@mvp.Player.FullName</span> }
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => OpenEditMatch(match)" title="Modifica">
+                                <span class="material-symbols-outlined" style="font-size:18px">edit</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(match)" title="Elimina">
+                                <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow:12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">@(isEditing ? "Modifica Partita" : "Nuova Partita")</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <small class="text-label-caps text-muted">Data fissa: 20 Giugno 2026</small>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="text-label-caps text-secondary">Orario</label>
+                            <InputDate Type="InputDateType.Time" class="form-control urban-input" @bind-Value="formTime" />
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="text-label-caps text-secondary">Campo</label>
+                            <select class="form-select urban-input" @bind="formMatch.Location">
+                                <option value="Campo A">Campo A</option>
+                                <option value="Campo B">Campo B</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="text-label-caps text-secondary">Avversario</label>
+                            <InputText class="form-control urban-input" @bind-Value="formMatch.Opponent" placeholder="Nome squadra avversaria" />
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="text-label-caps text-secondary">Tipo Partita</label>
+                            <select class="form-select urban-input" @bind="formMatchType">
+                                <option value="Group">Girone</option>
+                                <option value="Semi">Semifinale</option>
+                                <option value="Final">Finale</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <label class="text-label-caps text-secondary">Nostri Punti</label>
+                            <InputNumber class="form-control urban-input" @bind-Value="formMatch.OurPoints" />
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <label class="text-label-caps text-secondary">Loro Punti</label>
+                            <InputNumber class="form-control urban-input" @bind-Value="formMatch.TheirPoints" />
+                        </div>
+                        <div class="d-none d-sm-block col-sm-4"></div>
+                        <div class="col-12">
+                            <label class="text-label-caps text-secondary">Note</label>
+                            <textarea class="form-control urban-input" rows="2" @bind="formMatch.Notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="CloseModal">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="SaveMatch">SALVA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (deleteTarget != null)
+{
+    <div class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-surface border-0" style="box-shadow:12px 12px 0 rgba(0,0,0,0.15)">
+                <div class="modal-header border-0">
+                    <h5 class="text-headline-sm text-primary mb-0">Conferma Eliminazione</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="() => deleteTarget = null"></button>
+                </div>
+                <div class="modal-body"><p>Eliminare la partita <strong>VS @deleteTarget.Opponent</strong> delle <strong>@deleteTarget.DateTime.ToString("HH:mm")</strong>?</p></div>
+                <div class="modal-footer border-0">
+                    <button class="btn btn-secondary" @onclick="() => deleteTarget = null">ANNULLA</button>
+                    <button class="btn btn-primary" @onclick="DeleteMatch">ELIMINA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly DateTime TournamentDate = new(2026, 6, 20);
+    private bool loading = true;
+    private List<Match> matches = new();
+    private bool showModal, isEditing;
+    private Match formMatch = new();
+    private DateTime formTime = new(2026, 6, 20, 17, 0, 0);
+    private Match? deleteTarget;
+    private string formMatchType = "Group";
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+    private async Task LoadData() { matches = await MatchService.GetAllAsync(); loading = false; }
+
+    private void OpenAddMatch()
+    {
+        isEditing = false;
+        formMatch = new Match { DateTime = TournamentDate, Location = "Campo B" };
+        formTime = TournamentDate;
+        formMatchType = "Group";
+        showModal = true;
+    }
+
+    private void OpenEditMatch(Match match)
+    {
+        isEditing = true;
+        formMatch = new Match
+        {
+            Id = match.Id, DateTime = match.DateTime, Location = match.Location,
+            Opponent = match.Opponent, Type = match.Type,
+            OurPoints = match.OurPoints, TheirPoints = match.TheirPoints,
+            Notes = match.Notes, Status = match.Status,
+        };
+        formTime = match.DateTime;
+        formMatchType = match.Type.ToString();
+        showModal = true;
+    }
+
+    private void CloseModal() => showModal = false;
+
+    private async Task SaveMatch()
+    {
+        formMatch.DateTime = TournamentDate.Add(formTime.TimeOfDay);
+        formMatch.Type = Enum.Parse<MatchType>(formMatchType);
+        if (isEditing) await MatchService.UpdateAsync(formMatch);
+        else await MatchService.AddAsync(formMatch);
+        showModal = false; await LoadData();
+    }
+
+    private void ConfirmDelete(Match match) => deleteTarget = match;
+
+    private async Task DeleteMatch()
+    {
+        if (deleteTarget != null) { await MatchService.DeleteAsync(deleteTarget.Id); deleteTarget = null; await LoadData(); }
+    }
+}
