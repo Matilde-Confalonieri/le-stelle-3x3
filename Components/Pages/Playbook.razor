@@ -133,7 +133,7 @@ else
                 </div>
                 <div class="modal-footer border-0">
                     <button class="btn btn-secondary" @onclick="CloseModal">ANNULLA</button>
-                    <button class="btn btn-primary" @onclick="SaveScheme" disabled="@(string.IsNullOrWhiteSpace(form.Name))">SALVA</button>
+                    <button class="btn btn-primary" @onclick="SaveScheme">SALVA</button>
                 </div>
             </div>
         </div>
@@ -206,12 +206,20 @@ else
 
     private async Task SaveScheme()
     {
-        form.Category = Enum.Parse<SchemeCategory>(formCategory);
-        if (isEditing) await PlaybookService.UpdateAsync(form);
-        else await PlaybookService.AddAsync(form);
-        showModal = false;
-        await LoadData();
-        ApplyFilter();
+        if (string.IsNullOrWhiteSpace(form.Name)) return;
+        try
+        {
+            form.Category = Enum.Parse<SchemeCategory>(formCategory);
+            if (isEditing) await PlaybookService.UpdateAsync(form);
+            else await PlaybookService.AddAsync(form);
+            showModal = false;
+            await LoadData();
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errore salvataggio schema: {ex.Message}");
+        }
     }
 
     private void ConfirmDelete(PlaybookScheme s) { deleteTarget = s; showDeleteModal = true; }
