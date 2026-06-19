@@ -20,6 +20,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    Directory.CreateDirectory("data");
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     await using var context = await factory.CreateDbContextAsync();
     await context.Database.EnsureCreatedAsync();
