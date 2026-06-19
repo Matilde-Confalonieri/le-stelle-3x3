@@ -52,15 +52,41 @@ else
 
     <div class="row g-4 mt-4">
         <div class="col-lg-6">
-            <div class="chart-card">
+            <div class="card-stat">
                 <h4 class="section-title fs-5">VITTORIE / SCONFITTE</h4>
-                <canvas id="winLossChart"></canvas>
+                <div class="d-flex gap-4 align-items-center mt-3">
+                    <div class="text-center">
+                        <span class="text-stat-value text-primary">@standings.Wins</span>
+                        <span class="text-label-caps text-secondary d-block">Vittorie</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-stat-value">@standings.Losses</span>
+                        <span class="text-label-caps text-secondary d-block">Sconfitte</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-stat-value text-tertiary">@standings.WinPercentage%</span>
+                        <span class="text-label-caps text-secondary d-block">Win Rate</span>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="chart-card">
+            <div class="card-stat">
                 <h4 class="section-title fs-5">PUNTI FATTI vs SUBITI</h4>
-                <canvas id="ptsChart"></canvas>
+                <div class="d-flex gap-4 align-items-center mt-3">
+                    <div class="text-center">
+                        <span class="text-stat-value text-primary">@standings.PointsFor</span>
+                        <span class="text-label-caps text-secondary d-block">Punti Fatti</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-stat-value">@standings.PointsAgainst</span>
+                        <span class="text-label-caps text-secondary d-block">Punti Subiti</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-stat-value @(standings.Diff >= 0 ? "text-tertiary" : "text-error")">@(standings.Diff >= 0 ? "+" : "")@standings.Diff</span>
+                        <span class="text-label-caps text-secondary d-block">Differenza</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
