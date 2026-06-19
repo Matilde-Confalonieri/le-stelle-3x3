@@ -47,7 +47,7 @@
 
         var players = await PlayerService.SearchAsync(SearchQuery);
         foreach (var p in players.Take(3))
-            results.Add((p.FullName, $"#{p.JerseyNumber}", "person", $"/roster"));
+            results.Add((p.FullName, $"#{p.JerseyNumber} • {p.Role}", "person", $"/roster"));
 
         var matches = await MatchService.GetAllAsync();
         foreach (var m in matches.Where(x => x.Opponent.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)).Take(3))

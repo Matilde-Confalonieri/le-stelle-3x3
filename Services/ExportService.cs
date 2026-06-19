@@ -34,7 +34,7 @@ public class ExportService
             var games = p.MatchStats.Select(s => s.MatchId).Distinct().Count();
             var pts = p.MatchStats.Sum(s => s.Points);
             var avg = games > 0 ? pts / (double)games : 0;
-            csv.WriteField(p.FirstName); csv.WriteField(p.LastName); csv.WriteField(p.JerseyNumber.ToString());
+            csv.WriteField(p.FirstName); csv.WriteField(p.LastName); csv.WriteField(p.JerseyNumber.ToString()); csv.WriteField(p.Role);
             csv.WriteField(games.ToString()); csv.WriteField(pts.ToString()); csv.WriteField(avg.ToString("F1"));
             await csv.NextRecordAsync();
         }

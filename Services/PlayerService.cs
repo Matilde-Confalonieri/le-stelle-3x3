@@ -37,6 +37,7 @@ public class PlayerService : IPlayerService
         existing.FirstName = player.FirstName;
         existing.LastName = player.LastName;
         existing.JerseyNumber = player.JerseyNumber;
+        existing.Role = player.Role;
         existing.PhotoUrl = player.PhotoUrl;
         await ctx.SaveChangesAsync();
         return existing;

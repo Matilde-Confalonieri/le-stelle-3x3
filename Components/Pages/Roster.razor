@@ -44,7 +44,7 @@ else
                         </div>
                     </div>
                     <h5 class="text-headline-sm mb-1">@player.FullName</h5>
-                    <p class="text-label-caps text-secondary mb-3">#@player.JerseyNumber</p>
+                    <p class="text-label-caps text-secondary mb-3">#@player.JerseyNumber — @player.Role</p>
                     <div class="d-flex justify-content-center gap-3 mb-3">
                         <div>
                             <span class="text-stat-value text-primary d-block">@totalPts</span>
@@ -95,11 +95,21 @@ else
                             <label class="text-label-caps text-secondary">Cognome</label>
                             <InputText class="form-control urban-input" @bind-Value="form.LastName" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="text-label-caps text-secondary">Numero Maglia</label>
                             <InputNumber class="form-control urban-input" @bind-Value="form.JerseyNumber" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="text-label-caps text-secondary">Ruolo</label>
+                            <select class="form-select urban-input" @bind="form.Role">
+                                <option value="">Seleziona...</option>
+                                <option value="Play">Play</option>
+                                <option value="Guardia">Guardia</option>
+                                <option value="Ala">Ala</option>
+                                <option value="Lungo">Lungo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <label class="text-label-caps text-secondary">Foto</label>
                             <InputFile class="form-control urban-input" OnChange="OnPhotoSelected" accept="image/*" />
                             @if (!string.IsNullOrEmpty(form.PhotoUrl))
@@ -147,7 +157,7 @@ else
     private async Task LoadData() { players = await PlayerService.GetAllAsync(); loading = false; }
 
     private void OpenAdd() { isEditing = false; form = new Player(); showModal = true; }
-    private void OpenEdit(Player p) { isEditing = true; form = new Player { Id = p.Id, FirstName = p.FirstName, LastName = p.LastName, JerseyNumber = p.JerseyNumber, PhotoUrl = p.PhotoUrl }; showModal = true; }
+    private void OpenEdit(Player p) { isEditing = true; form = new Player { Id = p.Id, FirstName = p.FirstName, LastName = p.LastName, JerseyNumber = p.JerseyNumber, Role = p.Role, PhotoUrl = p.PhotoUrl }; showModal = true; }
     private void CloseModal() { showModal = false; }
 
     private async Task OnPhotoSelected(InputFileChangeEventArgs e)

@@ -16,10 +16,10 @@ public static class DbSeeder
 
         var players = new List<Player>
         {
-            new() { FirstName = "Arianna", LastName = "Panceri", JerseyNumber = 1 },
-            new() { FirstName = "Iris", LastName = "Camporeale", JerseyNumber = 5 },
-            new() { FirstName = "Matilde", LastName = "Confalonieri", JerseyNumber = 5 },
-            new() { FirstName = "Valentina", LastName = "Russica", JerseyNumber = 2 },
+            new() { FirstName = "Arianna", LastName = "Panceri", JerseyNumber = 1, Role = "Play" },
+            new() { FirstName = "Iris", LastName = "Camporeale", JerseyNumber = 5, Role = "Lungo" },
+            new() { FirstName = "Matilde", LastName = "Confalonieri", JerseyNumber = 5, Role = "Lungo" },
+            new() { FirstName = "Valentina", LastName = "Russica", JerseyNumber = 2, Role = "Play" },
         };
 
         context.Players.AddRange(players);

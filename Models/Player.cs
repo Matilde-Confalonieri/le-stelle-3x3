@@ -17,6 +17,9 @@ public class Player
     [Range(1, 99, ErrorMessage = "Il numero maglia deve essere tra 1 e 99")]
     public int JerseyNumber { get; set; }
 
+    [MaxLength(30)]
+    public string Role { get; set; } = string.Empty;
+
     [MaxLength(500000)]
     public string PhotoUrl { get; set; } = string.Empty;
 
