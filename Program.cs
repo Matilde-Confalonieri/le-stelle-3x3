@@ -24,6 +24,7 @@ using (var scope = app.Services.CreateScope())
     await using var context = await factory.CreateDbContextAsync();
     await context.Database.EnsureCreatedAsync();
     await DbSeeder.SeedAsync(context);
+    await DbSeeder.SeedTestDataAsync(context);
 }
 
 if (!app.Environment.IsDevelopment())
