@@ -117,7 +117,7 @@ else
                             <InputFile class="form-control urban-input" OnChange="OnFileSelected" accept="image/*" />
                             @if (!string.IsNullOrEmpty(form.ImageUrl))
                             {
-                                <p class="text-sm text-secondary mt-1">Immagine attuale: @form.ImageUrl</p>
+                                <p class="text-sm text-muted mt-1">Immagine caricata</p>
                             }
                             @if (uploading) { <div class="spinner-border spinner-border-sm text-primary mt-2"></div> }
                         </div>
