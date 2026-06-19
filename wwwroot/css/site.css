@@ -215,6 +215,11 @@ label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-
     position: relative; width: 100%; margin: 1.75rem auto;
     max-width: var(--bs-modal-width); pointer-events: auto;
 }
+
+@media (min-width: 768px) {
+    .modal { display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 8vh; padding-right: 5vw; }
+    .modal-dialog { margin: 0; }
+}
 .modal-content {
     position: relative; display: flex; flex-direction: column;
     width: 100%; border: 1px solid var(--border); border-radius: 16px;
