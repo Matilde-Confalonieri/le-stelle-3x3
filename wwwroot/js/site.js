@@ -9,6 +9,65 @@ function downloadFile(filename, base64Data) {
 
 // ============ CHARTS ============
 
+let _charts = {};
+
+function renderLineChart(canvasId, labels, data, label) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    if (_charts[canvasId]) _charts[canvasId].destroy();
+    _charts[canvasId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                borderColor: '#ab3600',
+                backgroundColor: 'rgba(171,54,0,0.08)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: '#ab3600',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, max: 25, ticks: { stepSize: 5, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+            }
+        }
+    });
+}
+
+function renderDoughnutChart(canvasId, labels, data, colors) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    if (_charts[canvasId]) _charts[canvasId].destroy();
+    _charts[canvasId] = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+    });
+}
+
+function renderBarChart(canvasId, labels, data, colors) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    if (_charts[canvasId]) _charts[canvasId].destroy();
+    _charts[canvasId] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderRadius: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+}
+
 let performanceChart, topScorersChart, scorersChart, reboundsChart, assistsChart, evalChart;
 let winLossChart, ptsChart, lastFiveChart;
 
