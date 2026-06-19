@@ -2,7 +2,6 @@
 @inject IStatsService StatsService
 @inject IMatchService MatchService
 @inject IPlayerService PlayerService
-@inject IJSRuntime JS
 
 <PageTitle>Statistiche — Le Stelle 3x3</PageTitle>
 
@@ -152,35 +151,48 @@ else
     </div>
 
     <div class="row g-4 mt-4">
-        <div class="col-md-6">
-            <div class="chart-card">
-                <h4 class="section-title fs-5">MIGLIOR MARCATORE</h4>
-                <p class="section-subtitle">Punti totali per giocatore</p>
-                <canvas id="scorersChart"></canvas>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">MIGLIOR MARCATORE</span>
+                @if (seasonStats.Any())
+                {
+                    var top = seasonStats.OrderByDescending(x => x.TotalPoints).First();
+                    <span class="stat-value text-primary d-block mt-2">@top.PlayerName</span>
+                    <span class="text-stat-sm">@top.TotalPoints PTS</span>
+                }
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="chart-card">
-                <h4 class="section-title fs-5">MIGLIOR RIMBALZISTA</h4>
-                <p class="section-subtitle">Rimbalzi totali per giocatore</p>
-                <canvas id="reboundsChart"></canvas>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">MIGLIOR RIMBALZISTA</span>
+                @if (seasonStats.Any())
+                {
+                    var top = seasonStats.OrderByDescending(x => x.TotalRebounds).First();
+                    <span class="stat-value text-primary d-block mt-2">@top.PlayerName</span>
+                    <span class="text-stat-sm">@top.TotalRebounds RIM</span>
+                }
             </div>
         </div>
-    </div>
-
-    <div class="row g-4 mt-1">
-        <div class="col-md-6">
-            <div class="chart-card">
-                <h4 class="section-title fs-5">MIGLIOR ASSISTMAN</h4>
-                <p class="section-subtitle">Assist totali per giocatore</p>
-                <canvas id="assistsChart"></canvas>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">MIGLIOR ASSISTMAN</span>
+                @if (seasonStats.Any())
+                {
+                    var top = seasonStats.OrderByDescending(x => x.TotalAssists).First();
+                    <span class="stat-value text-primary d-block mt-2">@top.PlayerName</span>
+                    <span class="text-stat-sm">@top.TotalAssists AST</span>
+                }
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="chart-card">
-                <h4 class="section-title fs-5">VALUTAZIONE MEDIA</h4>
-                <p class="section-subtitle">Media valutazione per giocatore</p>
-                <canvas id="evalChart"></canvas>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">VALUTAZIONE MEDIA</span>
+                @if (seasonStats.Any())
+                {
+                    var top = seasonStats.OrderByDescending(x => x.AvgEval).First();
+                    <span class="stat-value text-primary d-block mt-2">@top.PlayerName</span>
+                    <span class="text-stat-sm">@(top.AvgEval.ToString("F1"))</span>
+                }
             </div>
         </div>
     </div>
@@ -208,14 +220,6 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && seasonStats.Any())
-        {
-            var s = seasonStats.OrderByDescending(x => x.TotalPoints).ToList();
-            await JS.InvokeVoidAsync("renderBarChart", "scorersChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)x.TotalPoints).ToArray(), new[] { "#ab3600", "#ab3600", "#ab3600", "#ab3600" });
-            await JS.InvokeVoidAsync("renderBarChart", "reboundsChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)x.TotalRebounds).ToArray(), new[] { "#585e6f", "#585e6f", "#585e6f", "#585e6f" });
-            await JS.InvokeVoidAsync("renderBarChart", "assistsChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)x.TotalAssists).ToArray(), new[] { "#7fa000", "#7fa000", "#7fa000", "#7fa000" });
-            await JS.InvokeVoidAsync("renderBarChart", "evalChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)Math.Round(x.AvgEval, 1)).ToArray(), new[] { "#ff5f1f", "#ff5f1f", "#ff5f1f", "#ff5f1f" });
-        }
     }
 
     private async Task ApplyFilters()

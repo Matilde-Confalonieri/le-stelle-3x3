@@ -1,7 +1,6 @@
 @page "/"
 @inject IMatchService MatchService
 @inject IStatsService StatsService
-@inject IJSRuntime JS
 
 <PageTitle>Dashboard — Le Stelle 3x3</PageTitle>
 
@@ -130,19 +129,6 @@ else
     </div>
 </section>
 
-@if (summary.Played > 0)
-{
-    <section class="mb-4">
-        <div class="chart-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="section-title fs-5 mb-0">ANDAMENTO SQUADRA</h4>
-                <span class="text-label-caps text-secondary" style="font-size:10px">Punti per partita</span>
-            </div>
-            <canvas id="perfChart" style="max-height:280px"></canvas>
-        </div>
-    </section>
-}
-
 <div class="row g-4">
         <div class="col-12">
             <div class="chart-card">
@@ -196,19 +182,6 @@ else
         };
 
         loading = false;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && summary.Played > 0)
-        {
-            var allMatches = await MatchService.GetAllAsync();
-            var played = allMatches.Where(m => m.Status == MatchStatus.Played)
-                .OrderBy(m => m.DateTime).ToList();
-            var labels = played.Select(m => m.Opponent).ToArray();
-            var pts = played.Select(m => m.OurPoints).Select(p => (object)p).ToArray();
-            await JS.InvokeVoidAsync("renderLineChart", "perfChart", labels, pts, "Punti");
-        }
     }
 
     private class TeamSummary

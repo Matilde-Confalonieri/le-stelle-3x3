@@ -1,6 +1,5 @@
 @page "/tournament"
 @inject IMatchService MatchService
-@inject IJSRuntime JS
 
 <PageTitle>Classifica Torneo — Le Stelle 3x3</PageTitle>
 
@@ -52,16 +51,28 @@ else
     </div>
 
     <div class="row g-4 mt-4">
-        <div class="col-lg-6">
-            <div class="chart-card">
-                <h4 class="section-title fs-5">VITTORIE / SCONFITTE</h4>
-                <canvas id="winLossChart" style="max-height:240px"></canvas>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">VITTORIE</span>
+                <span class="stat-value text-primary d-block mt-2">@standings.Wins</span>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="chart-card">
-                <h4 class="section-title fs-5">PUNTI FATTI vs SUBITI</h4>
-                <canvas id="ptsChart" style="max-height:240px"></canvas>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">SCONFITTE</span>
+                <span class="stat-value d-block mt-2">@standings.Losses</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">PUNTI FATTI</span>
+                <span class="stat-value text-primary d-block mt-2">@standings.PointsFor</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-stat text-center">
+                <span class="stat-label">PUNTI SUBITI</span>
+                <span class="stat-value d-block mt-2">@standings.PointsAgainst</span>
             </div>
         </div>
     </div>
@@ -128,16 +139,5 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && standings.GamesPlayed > 0)
-        {
-            await JS.InvokeVoidAsync("renderDoughnutChart", "winLossChart",
-                new[] { "Vittorie", "Sconfitte" },
-                new object[] { standings.Wins, standings.Losses },
-                new[] { "#ab3600", "#c1c6d9" });
-            await JS.InvokeVoidAsync("renderBarChart", "ptsChart",
-                new[] { "Punti Fatti", "Punti Subiti" },
-                new object[] { standings.PointsFor, standings.PointsAgainst },
-                new[] { "#ab3600", "#585e6f" });
-        }
     }
 }
