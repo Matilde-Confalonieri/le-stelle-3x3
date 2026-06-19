@@ -106,41 +106,5 @@ public static class DbSeeder
 
         context.PlaybookSchemes.AddRange(schemes);
         await context.SaveChangesAsync();
-
-        await SeedTestDataAsync(context);
-    }
-
-    public static async Task SeedTestDataAsync(ApplicationDbContext context)
-    {
-        if (await context.PlayerMatchStats.AnyAsync()) return;
-
-        var players = await context.Players.OrderBy(p => p.Id).ToListAsync();
-        var matches = await context.Matches.OrderBy(m => m.DateTime).ToListAsync();
-        if (players.Count < 4 || matches.Count < 3) return;
-
-        var m1 = matches[0]; m1.Status = MatchStatus.Played; m1.OurPoints = 15; m1.TheirPoints = 12;
-        var m2 = matches[1]; m2.Status = MatchStatus.Played; m2.OurPoints = 21; m2.TheirPoints = 9;
-        var m3 = matches[2]; m3.Status = MatchStatus.Played; m3.OurPoints = 18; m3.TheirPoints = 19;
-
-        var stats = new List<PlayerMatchStats>
-        {
-            new() { PlayerId = players[0].Id, MatchId = m1.Id, Points = 6, Rebounds = 2, Assists = 3, Steals = 1, Blocks = 1, Fouls = 1 },
-            new() { PlayerId = players[1].Id, MatchId = m1.Id, Points = 4, Rebounds = 3, Assists = 2, Steals = 2, Blocks = 0, Fouls = 2 },
-            new() { PlayerId = players[2].Id, MatchId = m1.Id, Points = 3, Rebounds = 1, Assists = 4, Steals = 1, Blocks = 0, Fouls = 1 },
-            new() { PlayerId = players[3].Id, MatchId = m1.Id, Points = 2, Rebounds = 4, Assists = 0, Steals = 0, Blocks = 2, Fouls = 1 },
-
-            new() { PlayerId = players[0].Id, MatchId = m2.Id, Points = 9, Rebounds = 3, Assists = 2, Steals = 2, Blocks = 1, Fouls = 0 },
-            new() { PlayerId = players[1].Id, MatchId = m2.Id, Points = 5, Rebounds = 1, Assists = 5, Steals = 1, Blocks = 0, Fouls = 1 },
-            new() { PlayerId = players[2].Id, MatchId = m2.Id, Points = 4, Rebounds = 4, Assists = 1, Steals = 1, Blocks = 1, Fouls = 2 },
-            new() { PlayerId = players[3].Id, MatchId = m2.Id, Points = 3, Rebounds = 2, Assists = 0, Steals = 0, Blocks = 0, Fouls = 0 },
-
-            new() { PlayerId = players[0].Id, MatchId = m3.Id, Points = 8, Rebounds = 2, Assists = 3, Steals = 1, Blocks = 0, Fouls = 2 },
-            new() { PlayerId = players[1].Id, MatchId = m3.Id, Points = 5, Rebounds = 3, Assists = 4, Steals = 2, Blocks = 0, Fouls = 3 },
-            new() { PlayerId = players[2].Id, MatchId = m3.Id, Points = 3, Rebounds = 1, Assists = 1, Steals = 1, Blocks = 1, Fouls = 1 },
-            new() { PlayerId = players[3].Id, MatchId = m3.Id, Points = 2, Rebounds = 5, Assists = 0, Steals = 0, Blocks = 2, Fouls = 2 },
-        };
-
-        context.PlayerMatchStats.AddRange(stats);
-        await context.SaveChangesAsync();
     }
 }
