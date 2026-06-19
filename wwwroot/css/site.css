@@ -389,11 +389,11 @@ body {
     content: '';
     position: absolute;
     top: 0; right: 0;
-    width: 200px; height: 200px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23ffffff10' d='M24 4c11 0 20 9 20 20S35 44 24 44 4 35 4 24 13 4 24 4zm0 2C14.1 6 6 14.1 6 24s8.1 18 18 18 18-8.1 18-18S33.9 6 24 6z'/%3E%3Cpath fill='%23ffffff10' d='M24 12c6.6 0 12 5.4 12 12s-5.4 12-12 12-12-5.4-12-12 5.4-12 12-12z'/%3E%3C/svg%3E");
-    background-size: 200px;
+    width: 220px; height: 220px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23ffffff08' d='M24 4c11 0 20 9 20 20S35 44 24 44 4 35 4 24 13 4 24 4zm0 2C14.1 6 6 14.1 6 24s8.1 18 18 18 18-8.1 18-18S33.9 6 24 6z'/%3E%3Ccircle fill='%23ffffff10' cx='24' cy='24' r='12'/%3E%3Cpath fill='none' stroke='%23ffffff10' stroke-width='1.5' d='M24 8v32M8 24h32'/%3E%3Cpath fill='none' stroke='%23ffffff10' stroke-width='0.8' d='M24 12c6.6 0 12 5.4 12 12s-5.4 12-12 12'/%3E%3C/svg%3E");
+    background-size: 220px;
     opacity: 0.3;
-    transform: rotate(12deg) scale(1.5);
+    transform: rotate(12deg) scale(1.4);
 }
 
 .card-scheme {
