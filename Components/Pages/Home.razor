@@ -74,7 +74,7 @@ else
                             </div>
                             <div class="mt-4 d-flex align-items-center gap-2 text-tertiary-fixed">
                                 <span class="material-symbols-outlined" style="font-size:16px">location_on</span>
-                                <span class="text-label-caps" style="font-size:11px"><span style="background:@nextMatch.LocationColor;color:#fff;padding:0.15rem 0.5rem;border-radius:4px">@nextMatch.Location</span></span>
+                                <span class="badge-status-scheduled" style="background:@nextMatch.LocationColor">@nextMatch.Location</span>
                             </div>
                         </div>
                     </div>
@@ -139,9 +139,10 @@ else
                         {
                             <tr>
                                 <td class="text-label-caps fw-bold">@m.DateTime.ToString("HH:mm")</td>
-                                <td><span style="background:@m.LocationColor;color:#fff;padding:0.15rem 0.5rem;border-radius:4px;font-size:10px;font-weight:700">@m.Location</span></td>
-                                <td class="fw-bold">@m.Opponent</td>
-                                <td><span style="background:@m.TypeColor;color:#fff;padding:0.15rem 0.5rem;border-radius:4px;font-size:10px;font-weight:700">@m.TypeDisplay</span></td>
+                                <td class="text-nowrap">
+                                    <span class="badge-status-scheduled" style="background:@m.LocationColor">@m.Location</span>
+                                    <span class="badge-status-scheduled" style="background:@m.TypeColor">@m.TypeDisplay</span>
+                                </td>
                                 <td><span class="badge-status-scheduled">@m.StatusDisplay</span></td>
                             </tr>
                         }
