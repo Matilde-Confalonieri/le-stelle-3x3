@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: le-stelle-3x3
-    env: docker
-    plan: free
-    disk:
-      name: sqlite-data
-      mountPath: /app/data
-      sizeGB: 1
