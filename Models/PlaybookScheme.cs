@@ -12,7 +12,7 @@ public class PlaybookScheme
 
     public SchemeCategory Category { get; set; } = SchemeCategory.Offense;
 
-    [MaxLength(500)]
+    [MaxLength(500000)]
     public string ImageUrl { get; set; } = string.Empty;
 
     [MaxLength(2000)]
