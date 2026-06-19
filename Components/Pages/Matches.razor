@@ -42,7 +42,7 @@ else
                         <td class="text-label-caps fw-bold">@match.DateTime.ToString("HH:mm")</td>
                         <td><span style="background:@match.LocationColor;color:#fff;padding:0.2rem 0.6rem;border-radius:6px;font-size:11px;font-weight:700">@match.Location</span></td>
                                 <td class="fw-bold">@match.Opponent</td>
-                                <td><span class="badge-status-scheduled">@match.Tournament</span></td>
+                                <td><span style="background:@match.TournamentColor;color:#fff;padding:0.2rem 0.6rem;border-radius:6px;font-size:11px;font-weight:700">@match.Tournament</span></td>
                         <td><span style="background:@match.TypeColor;color:#fff;padding:0.2rem 0.6rem;border-radius:6px;font-size:11px;font-weight:700">@match.TypeDisplay</span></td>
                         <td>
                             @if (match.Status == MatchStatus.Scheduled)

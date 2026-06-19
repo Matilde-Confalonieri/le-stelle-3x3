@@ -60,6 +60,12 @@ public class Match
         _ => "#6C757D"
     };
 
+    public string TournamentColor => Tournament switch
+    {
+        "Sunset" => "#FF6B6B",
+        _ => "#6C757D"
+    };
+
     public string StatusDisplay => Status switch
     {
         MatchStatus.Scheduled => "In Programma",
