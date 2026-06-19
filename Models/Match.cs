@@ -53,6 +53,15 @@ public class Match
         _ => "#FF7A00"
     };
 
+    public string TypeBg => Type switch
+    {
+        MatchType.Group => "rgba(255,122,0,0.15)",
+        MatchType.Quarter => "rgba(192,192,192,0.15)",
+        MatchType.Semi => "rgba(255,215,0,0.15)",
+        MatchType.Final => "rgba(255,204,0,0.15)",
+        _ => "rgba(255,122,0,0.15)"
+    };
+
     public string LocationColor => Location switch
     {
         "Campo A" => "#00BFFF",
@@ -60,10 +69,23 @@ public class Match
         _ => "#6C757D"
     };
 
+    public string LocationBg => Location switch
+    {
+        "Campo A" => "rgba(0,191,255,0.15)",
+        "Campo B" => "rgba(138,43,226,0.15)",
+        _ => "rgba(108,117,125,0.15)"
+    };
+
     public string TournamentColor => Tournament switch
     {
         "Sunset" => "#FF6B6B",
         _ => "#6C757D"
+    };
+
+    public string TournamentBg => Tournament switch
+    {
+        "Sunset" => "rgba(255,107,107,0.15)",
+        _ => "rgba(108,117,125,0.15)"
     };
 
     public string StatusDisplay => Status switch
