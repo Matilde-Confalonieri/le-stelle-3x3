@@ -1,6 +1,8 @@
 bin/
 obj/
 tournament.db
+tournament.db-shm
+tournament.db-wal
 wwwroot/uploads/*
 !wwwroot/uploads/.gitkeep
 *.user
