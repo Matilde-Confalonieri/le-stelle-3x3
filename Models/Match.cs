@@ -44,6 +44,22 @@ public class Match
         _ => "Girone"
     };
 
+    public string TypeColor => Type switch
+    {
+        MatchType.Group => "#FF7A00",
+        MatchType.Quarter => "#C0C0C0",
+        MatchType.Semi => "#FFD700",
+        MatchType.Final => "#FFCC00",
+        _ => "#FF7A00"
+    };
+
+    public string LocationColor => Location switch
+    {
+        "Campo A" => "#00BFFF",
+        "Campo B" => "#8A2BE2",
+        _ => "#6C757D"
+    };
+
     public string StatusDisplay => Status switch
     {
         MatchStatus.Scheduled => "In Programma",
