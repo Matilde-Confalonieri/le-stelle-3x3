@@ -5,7 +5,11 @@ using ThreeByThreeManager.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddHubOptions(options =>
+    {
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+    });
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));

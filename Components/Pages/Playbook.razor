@@ -196,10 +196,16 @@ else
         uploading = true;
         try
         {
-            var buffer = new byte[file.Size];
-            await file.OpenReadStream(2 * 1024 * 1024).ReadAsync(buffer);
-            var base64 = Convert.ToBase64String(buffer);
-            form.ImageUrl = $"data:image/{Path.GetExtension(file.Name).TrimStart('.')};base64,{base64}";
+            var maxSize = 5 * 1024 * 1024;
+            using var ms = new MemoryStream();
+            var stream = file.OpenReadStream(maxSize);
+            await stream.CopyToAsync(ms);
+            var base64 = Convert.ToBase64String(ms.ToArray());
+            form.ImageUrl = $"data:{file.ContentType};base64,{base64}";
+        }
+        catch (Exception ex)
+        {
+            form.ImageUrl = "";
         }
         finally { uploading = false; }
     }
