@@ -71,40 +71,5 @@ public static class DbSeeder
 
         context.Matches.AddRange(matches);
         await context.SaveChangesAsync();
-
-        var schemes = new List<PlaybookScheme>
-        {
-            new()
-            {
-                Name = "Pick & Roll Centrale",
-                Category = SchemeCategory.Offense,
-                Description = "Schema di attacco con pick and roll centrale. Il playmaker chiama il blocco del lungo al centro del campo. Dopo il blocco, il lungo rolla a canestro mentre il playmaker può attaccare o scaricare.",
-                Notes = "Efficace contro difese statiche."
-            },
-            new()
-            {
-                Name = "Difesa a Uomo Pressing",
-                Category = SchemeCategory.Defense,
-                Description = "Difesa a uomo aggressiva su tutto il campo. Pressione costante sul portatore di palla, raddoppi sulle rimesse e aiuto immediato sui cambi.",
-                Notes = "Ideale quando si è in svantaggio o nei momenti decisivi."
-            },
-            new()
-            {
-                Name = "Rimessa dal Fondo",
-                Category = SchemeCategory.Inbound,
-                Description = "Schema per rimessa dal fondo dopo canestro subìto. Due giocatori bloccano per liberare il playmaker.",
-                Notes = "Variante A: ricezione playmaker. Variante B: passaggio lungo diretto."
-            },
-            new()
-            {
-                Name = "Gioco da Sotto",
-                Category = SchemeCategory.Special,
-                Description = "Schema per situazioni di confusione sotto canestro. Blocchi incrociati per liberare il tiratore sull'arco.",
-                Notes = "Ultimo possesso con pochi secondi sul cronometro."
-            },
-        };
-
-        context.PlaybookSchemes.AddRange(schemes);
-        await context.SaveChangesAsync();
     }
 }
