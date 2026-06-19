@@ -2,6 +2,7 @@
 @inject IStatsService StatsService
 @inject IMatchService MatchService
 @inject IPlayerService PlayerService
+@inject IJSRuntime JS
 
 <PageTitle>Statistiche — Le Stelle 3x3</PageTitle>
 
@@ -207,6 +208,14 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender && seasonStats.Any())
+        {
+            var s = seasonStats.OrderByDescending(x => x.TotalPoints).ToList();
+            await JS.InvokeVoidAsync("renderBarChart", "scorersChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)x.TotalPoints).ToArray(), new[] { "#ab3600", "#ab3600", "#ab3600", "#ab3600" });
+            await JS.InvokeVoidAsync("renderBarChart", "reboundsChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)x.TotalRebounds).ToArray(), new[] { "#585e6f", "#585e6f", "#585e6f", "#585e6f" });
+            await JS.InvokeVoidAsync("renderBarChart", "assistsChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)x.TotalAssists).ToArray(), new[] { "#7fa000", "#7fa000", "#7fa000", "#7fa000" });
+            await JS.InvokeVoidAsync("renderBarChart", "evalChart", s.Select(x => x.PlayerName).ToArray(), s.Select(x => (object)Math.Round(x.AvgEval, 1)).ToArray(), new[] { "#ff5f1f", "#ff5f1f", "#ff5f1f", "#ff5f1f" });
+        }
     }
 
     private async Task ApplyFilters()

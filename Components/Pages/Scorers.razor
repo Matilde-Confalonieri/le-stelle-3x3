@@ -51,7 +51,7 @@ else
                             <td>@s.AvgPoints.ToString("F1")</td>
                             <td>@seasonStatsDict[s.PlayerId].TotalRebounds</td>
                             <td>@seasonStatsDict[s.PlayerId].TotalAssists</td>
-                            <td class="fw-bold">@seasonStatsDict[s.PlayerId].AvgEval.ToString("F1")</td>
+                            <td class="fw-bold">@(seasonStatsDict[s.PlayerId].AvgEval.ToString("F1"))</td>
                         </tr>
                     }
                     @if (!rankings.Any())
