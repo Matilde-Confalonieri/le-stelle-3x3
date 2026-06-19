@@ -840,23 +840,27 @@ label.text-label-caps {
 /* ============ RULES PAGE ============ */
 .rules-section {
     background: var(--surface-container-lowest);
-    border: 1px solid rgba(143, 112, 102, 0.1);
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.12);
+    border: 1px solid rgba(143, 112, 102, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
     padding: 2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 .rules-section h3 {
     font-family: var(--font-display);
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 800;
     color: var(--primary);
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--primary);
+    border-bottom: 2px solid rgba(171, 54, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .rules-section h4 {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--on-surface);
     margin-top: 1.25rem;
@@ -868,6 +872,7 @@ label.text-label-caps {
 .rules-section li {
     margin-bottom: 0.5rem;
     line-height: 1.6;
+    font-size: 14px;
 }
 
 /* ============ CALENDAR ============ */
@@ -916,8 +921,34 @@ label.text-label-caps {
 .chart-card {
     background: var(--surface-container-lowest);
     border: 1px solid rgba(143, 112, 102, 0.1);
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.12);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
     padding: 1.5rem;
+}
+
+/* ============ SECTION HEADERS ============ */
+.section-header {
+    background: linear-gradient(135deg, #3a3f4a 0%, #585e6f 100%);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 12px 12px 0 0;
+}
+.table-container {
+    background: var(--surface-container-lowest);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(143, 112, 102, 0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
+}
+.table-container .table-stats {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 /* ============ MOBILE SIDEBAR ============ */
