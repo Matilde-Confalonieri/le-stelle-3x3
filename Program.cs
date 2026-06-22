@@ -12,7 +12,7 @@ builder.Services.AddRazorComponents()
     });
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
@@ -24,7 +24,6 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    Directory.CreateDirectory("data");
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     await using var context = await factory.CreateDbContextAsync();
     await context.Database.EnsureCreatedAsync();
