@@ -121,17 +121,16 @@ RESEED=true dotnet run
 
 ## Pubblicazione
 
-L'app è configurata per Fly.io (`fly.toml` + `Dockerfile`) con database PostgreSQL Neon.
+L'app è ospitata su **Render** (https://le-stelle-3x3.onrender.com) tramite Docker, perché Render non supporta .NET in modo nativo. Il database è PostgreSQL (Neon, via variabile `DATABASE_URL`). L'app gira sui server di Render e resta attiva 24/7, indipendentemente dal PC locale.
 
-```bash
-# 1. Pubblica la nuova build
-fly deploy
+Ogni push sul branch `main` attiva automaticamente un nuovo deploy su Render.
 
-# 2. (Opzionale) Forza il re-seed dei dati demo sul DB di produzione
-fly secrets set RESEED=true
-fly deploy
-fly secrets unset RESEED
-```
+Per **forzare il re-seed** dei dati demo sul sito online:
+
+1. Pannello Render → servizio `le-stelle-3x3` → tab **Environment**.
+2. Aggiungi la variabile `RESEED` = `true` e salva (Render riavvia il servizio).
+3. Al primo avvio il DB demo viene svuotato e ripopolato con i dati aggiornati.
+4. Rimuovi la variabile `RESEED` (o imposta `false`) per i deploy successivi.
 
 In alternativa, pubblica manualmente:
 
