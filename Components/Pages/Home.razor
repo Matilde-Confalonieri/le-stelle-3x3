@@ -2,7 +2,7 @@
 @inject IMatchService MatchService
 @inject IStatsService StatsService
 
-<PageTitle>Dashboard — Le Stelle 3x3</PageTitle>
+<PageTitle>Dashboard — Le Stelle 5x5</PageTitle>
 
 @if (loading)
 {
@@ -13,8 +13,8 @@ else
     <section class="mb-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="section-title">TOURNAMENT CENTER</h1>
-                <p class="section-subtitle mb-0">Torneo Sunset — 20 Giugno 2026</p>
+                <h1 class="section-title">CAMPIONATO</h1>
+                <p class="section-subtitle mb-0">Serie A1 Femminile — Stagione 2025/26</p>
             </div>
         </div>
 
@@ -43,7 +43,7 @@ else
                                     <p class="text-label-caps text-secondary-fixed opacity-75 mb-0">@nextMatch.TypeDisplay.ToUpper() • <span style="background:@nextMatch.TournamentColor;color:#fff;padding:0.1rem 0.5rem;border-radius:4px;font-size:10px">@nextMatch.Tournament</span></p>
                                 </div>
                                 <div class="text-md-end">
-                                    <span class="text-stat-value text-primary-fixed-dim d-block">20 GIUGNO</span>
+                                    <span class="text-stat-value text-primary-fixed-dim d-block">@nextMatch.DateTime.ToString("dd MMMM").ToUpper()</span>
                                     <span class="text-headline-md text-white">@nextMatch.DateTime.ToString("HH:mm")</span>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@ else
 <div class="row g-4">
         <div class="col-12">
             <div class="chart-card">
-                <h4 class="section-title fs-5">PROSSIME PARTITE — 20 GIUGNO 2026</h4>
+                <h4 class="section-title fs-5">PROSSIME PARTITE</h4>
                 <div class="table-responsive mt-3">
                 <table class="table-stats mb-0">
                     <thead><tr><th>Orario</th><th>Campo</th><th>Avversario</th><th>Tipo</th><th>Stato</th></tr></thead>

@@ -33,15 +33,17 @@ public class Match
 
     public List<PlayerMatchStats> PlayerStats { get; set; } = new();
 
+    public List<Shot> Shots { get; set; } = new();
+
     public bool IsVictory => Status == MatchStatus.Played && OurPoints > TheirPoints;
 
     public string TypeDisplay => Type switch
     {
-        MatchType.Group => "Girone",
+        MatchType.Group => "Regular Season",
         MatchType.Quarter => "Quarti di Finale",
         MatchType.Semi => "Semifinale",
         MatchType.Final => "Finale",
-        _ => "Girone"
+        _ => "Regular Season"
     };
 
     public string TypeColor => Type switch
@@ -66,6 +68,8 @@ public class Match
     {
         "Campo A" => "#00BFFF",
         "Campo B" => "#8A2BE2",
+        "Casa" => "#28A745",
+        "Trasferta" => "#8A2BE2",
         _ => "#6C757D"
     };
 
@@ -73,17 +77,21 @@ public class Match
     {
         "Campo A" => "rgba(0,191,255,0.15)",
         "Campo B" => "rgba(138,43,226,0.15)",
+        "Casa" => "rgba(40,167,69,0.15)",
+        "Trasferta" => "rgba(138,43,226,0.15)",
         _ => "rgba(108,117,125,0.15)"
     };
 
     public string TournamentColor => Tournament switch
     {
+        "Serie A1" => "#FF6B6B",
         "Sunset" => "#FF6B6B",
         _ => "#6C757D"
     };
 
     public string TournamentBg => Tournament switch
     {
+        "Serie A1" => "rgba(255,107,107,0.15)",
         "Sunset" => "rgba(255,107,107,0.15)",
         _ => "rgba(108,117,125,0.15)"
     };

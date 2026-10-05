@@ -3,7 +3,7 @@
 @inject IMatchService MatchService
 @inject IPlayerService PlayerService
 
-<PageTitle>Statistiche — Le Stelle 3x3</PageTitle>
+<PageTitle>Statistiche — Le Stelle 5x5</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
@@ -38,6 +38,55 @@ else
                     <option value="@m.Id">VS @m.Opponent — @m.DateTime.ToString("dd/MM")</option>
                 }
             </select>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="table-container">
+                <div class="section-header">TIRI DAL CAMPO — MAPPA E PERCENTUALI</div>
+                <div class="row g-3 p-3">
+                    <div class="col-md-3">
+                        <label class="text-label-caps text-secondary">Giocatore</label>
+                        <select class="form-select urban-input" @bind="chartPlayerId" @bind:after="LoadShotChart">
+                            @foreach (var p in players)
+                            {
+                                <option value="@p.Id">@p.FullName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-label-caps text-secondary">Partita</label>
+                        <select class="form-select urban-input" @bind="chartMatchId" @bind:after="LoadShotChart">
+                            <option value="0">Tutta la stagione</option>
+                            @foreach (var m in allMatches.Where(m => m.Status == MatchStatus.Played))
+                            {
+                                <option value="@m.Id">VS @m.Opponent — @m.DateTime.ToString("dd/MM")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="shot-legend">
+                                <span><span class="dot made"></span>Canestro</span>
+                                <span><span class="dot missed"></span>Sbagliato</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                @foreach (var (label, value, color) in pctCards)
+                                {
+                                    <div class="card-stat text-center py-2 px-3">
+                                        <span class="stat-label" style="font-size:9px">@label</span>
+                                        <span class="stat-value d-block" style="color:@color">@value</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-3 pb-3">
+                    <ShotChart Shots="@shotChartShots" />
+                </div>
+            </div>
         </div>
     </div>
 
@@ -204,6 +253,11 @@ else
     private int filterPlayerId;
     private int filterMatchId;
 
+    private int chartPlayerId;
+    private int chartMatchId;
+    private List<Shot> shotChartShots = new();
+    private List<(string Label, string Value, string Color)> pctCards = new();
+
     protected override async Task OnInitializedAsync()
     {
         allStats = await StatsService.GetAllStatsAsync();
@@ -211,7 +265,32 @@ else
         seasonStats = await StatsService.GetSeasonStatsAsync();
         players = await PlayerService.GetAllAsync();
         allMatches = await MatchService.GetAllAsync();
+
+        chartPlayerId = players.FirstOrDefault()?.Id ?? 0;
+        await LoadShotChart();
+
         loading = false;
+    }
+
+    private async Task LoadShotChart()
+    {
+        if (chartPlayerId == 0)
+        {
+            shotChartShots = new();
+            pctCards = new();
+            return;
+        }
+
+        int? matchId = chartMatchId == 0 ? null : chartMatchId;
+        shotChartShots = await StatsService.GetShotsByPlayerAsync(chartPlayerId, matchId);
+        var pct = await StatsService.GetShootingPercentagesAsync(chartPlayerId, matchId);
+        pctCards = new List<(string, string, string)>
+        {
+            ($"FG {pct.FieldGoalsMade}/{pct.FieldGoalsAttempted}", pct.FieldGoalPct.ToString("F1") + "%", "#FF7A00"),
+            ($"3P {pct.ThreePointersMade}/{pct.ThreePointersAttempted}", pct.ThreePointPct.ToString("F1") + "%", "#0DCAF0"),
+            ($"2P {pct.TwoPointersMade}/{pct.TwoPointersAttempted}", pct.TwoPointPct.ToString("F1") + "%", "#20C997"),
+            ($"FT {pct.FreeThrowsMade}/{pct.FreeThrowsAttempted}", pct.FreeThrowPct.ToString("F1") + "%", "#FFC107"),
+        };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

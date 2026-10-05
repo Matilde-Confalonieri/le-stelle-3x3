@@ -13,6 +13,27 @@ public interface IStatsService
     Task<PlayerMatchStats?> GetMatchMVPAsync(int matchId);
     Task<List<PlayerSeasonStats>> GetSeasonStatsAsync();
     Task<List<ScorerRanking>> GetScorerRankingsAsync();
+    Task<List<Shot>> GetShotsByPlayerAsync(int playerId, int? matchId = null);
+    Task<List<Shot>> GetShotsByMatchAsync(int matchId);
+    Task<ShootingPercentages> GetShootingPercentagesAsync(int playerId, int? matchId = null);
+    Task<Shot> AddShotAsync(Shot shot);
+    Task DeleteShotAsync(int id);
+}
+
+public class ShootingPercentages
+{
+    public int FieldGoalsMade { get; set; }
+    public int FieldGoalsAttempted { get; set; }
+    public int ThreePointersMade { get; set; }
+    public int ThreePointersAttempted { get; set; }
+    public int TwoPointersMade { get; set; }
+    public int TwoPointersAttempted { get; set; }
+    public int FreeThrowsMade { get; set; }
+    public int FreeThrowsAttempted { get; set; }
+    public double FieldGoalPct => FieldGoalsAttempted > 0 ? FieldGoalsMade / (double)FieldGoalsAttempted * 100 : 0;
+    public double ThreePointPct => ThreePointersAttempted > 0 ? ThreePointersMade / (double)ThreePointersAttempted * 100 : 0;
+    public double TwoPointPct => TwoPointersAttempted > 0 ? TwoPointersMade / (double)TwoPointersAttempted * 100 : 0;
+    public double FreeThrowPct => FreeThrowsAttempted > 0 ? FreeThrowsMade / (double)FreeThrowsAttempted * 100 : 0;
 }
 
 public class PlayerSeasonStats

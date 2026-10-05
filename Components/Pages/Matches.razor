@@ -1,12 +1,12 @@
 @page "/matches"
 @inject IMatchService MatchService
 
-<PageTitle>Partite — Le Stelle 3x3</PageTitle>
+<PageTitle>Partite — Le Stelle 5x5</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
         <h1 class="section-title">PARTITE</h1>
-        <p class="section-subtitle mb-0">Torneo Sunset — 20 Giugno 2026</p>
+        <p class="section-subtitle mb-0">Serie A1 Femminile — Stagione 2025/26</p>
     </div>
     <button class="btn btn-primary" @onclick="OpenAddMatch">
         <span class="material-symbols-outlined align-middle me-1">add</span> NUOVA PARTITA
@@ -27,7 +27,7 @@ else
                     <th>Orario</th>
                     <th>Campo</th>
                     <th>Avversario</th>
-                    <th>Torneo</th>
+                    <th>Campionato</th>
                     <th>Tipo</th>
                     <th>Stato</th>
                     <th>Risultato</th>
@@ -101,6 +101,8 @@ else
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="text-label-caps text-secondary">Campo</label>
                             <select class="form-select urban-input" @bind="formMatch.Location">
+                                <option value="Casa">Casa</option>
+                                <option value="Trasferta">Trasferta</option>
                                 <option value="Campo A">Campo A</option>
                                 <option value="Campo B">Campo B</option>
                             </select>
@@ -110,13 +112,14 @@ else
                             <InputText class="form-control urban-input" @bind-Value="formMatch.Opponent" placeholder="Nome squadra avversaria" />
                         </div>
                         <div class="col-12 col-sm-6">
-                            <label class="text-label-caps text-secondary">Torneo</label>
-                            <InputText class="form-control urban-input" @bind-Value="formMatch.Tournament" placeholder="Nome torneo" />
+                            <label class="text-label-caps text-secondary">Campionato</label>
+                            <InputText class="form-control urban-input" @bind-Value="formMatch.Tournament" placeholder="Es. Serie A1" />
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="text-label-caps text-secondary">Tipo Partita</label>
                             <select class="form-select urban-input" @bind="formMatchType">
-                                <option value="Group">Girone</option>
+                                <option value="Group">Regular Season</option>
+                                <option value="Quarter">Quarti di Finale</option>
                                 <option value="Semi">Semifinale</option>
                                 <option value="Final">Finale</option>
                             </select>
@@ -181,7 +184,7 @@ else
     private void OpenAddMatch()
     {
         isEditing = false;
-        formMatch = new Match { DateTime = TournamentDate, Location = "Campo B" };
+        formMatch = new Match { DateTime = TournamentDate, Location = "Casa" };
         formTime = TournamentDate;
         formDate = TournamentDate;
         formMatchType = "Group";

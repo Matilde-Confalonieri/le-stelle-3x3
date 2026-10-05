@@ -48,6 +48,8 @@ public class StatsService : IStatsService
             existing.Points = stats.Points; existing.Rebounds = stats.Rebounds;
             existing.Assists = stats.Assists; existing.Steals = stats.Steals;
             existing.Blocks = stats.Blocks; existing.Fouls = stats.Fouls;
+            existing.FreeThrowsMade = stats.FreeThrowsMade;
+            existing.FreeThrowsAttempted = stats.FreeThrowsAttempted;
         }
         else { ctx.PlayerMatchStats.Add(stats); existing = stats; }
         await ctx.SaveChangesAsync();
@@ -93,5 +95,59 @@ public class StatsService : IStatsService
             JerseyNumber = s.JerseyNumber, PhotoUrl = s.PhotoUrl,
             TotalPoints = s.TotalPoints, GamesPlayed = s.GamesPlayed,
         }).OrderByDescending(s => s.TotalPoints).ToList();
+    }
+
+    public async Task<List<Shot>> GetShotsByPlayerAsync(int playerId, int? matchId = null)
+    {
+        await using var ctx = await _factory.CreateDbContextAsync();
+        return await ctx.Shots
+            .Where(s => s.PlayerId == playerId && (!matchId.HasValue || s.MatchId == matchId.Value))
+            .OrderBy(s => s.Id)
+            .ToListAsync();
+    }
+
+    public async Task<List<Shot>> GetShotsByMatchAsync(int matchId)
+    {
+        await using var ctx = await _factory.CreateDbContextAsync();
+        return await ctx.Shots.Where(s => s.MatchId == matchId).OrderBy(s => s.Id).ToListAsync();
+    }
+
+    public async Task<ShootingPercentages> GetShootingPercentagesAsync(int playerId, int? matchId = null)
+    {
+        await using var ctx = await _factory.CreateDbContextAsync();
+        var shots = await ctx.Shots
+            .Where(s => s.PlayerId == playerId && (!matchId.HasValue || s.MatchId == matchId.Value))
+            .ToListAsync();
+
+        var stats = await ctx.PlayerMatchStats
+            .Where(s => s.PlayerId == playerId && (!matchId.HasValue || s.MatchId == matchId.Value))
+            .ToListAsync();
+
+        return new ShootingPercentages
+        {
+            FieldGoalsMade = shots.Count(s => s.Made),
+            FieldGoalsAttempted = shots.Count,
+            ThreePointersMade = shots.Count(s => s.IsThree && s.Made),
+            ThreePointersAttempted = shots.Count(s => s.IsThree),
+            TwoPointersMade = shots.Count(s => !s.IsThree && s.Made),
+            TwoPointersAttempted = shots.Count(s => !s.IsThree),
+            FreeThrowsMade = stats.Sum(s => s.FreeThrowsMade),
+            FreeThrowsAttempted = stats.Sum(s => s.FreeThrowsAttempted),
+        };
+    }
+
+    public async Task<Shot> AddShotAsync(Shot shot)
+    {
+        await using var ctx = await _factory.CreateDbContextAsync();
+        ctx.Shots.Add(shot);
+        await ctx.SaveChangesAsync();
+        return shot;
+    }
+
+    public async Task DeleteShotAsync(int id)
+    {
+        await using var ctx = await _factory.CreateDbContextAsync();
+        var shot = await ctx.Shots.FindAsync(id);
+        if (shot != null) { ctx.Shots.Remove(shot); await ctx.SaveChangesAsync(); }
     }
 }

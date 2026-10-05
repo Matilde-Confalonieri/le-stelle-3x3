@@ -25,6 +25,8 @@ public class Player
 
     public List<PlayerMatchStats> MatchStats { get; set; } = new();
 
+    public List<Shot> Shots { get; set; } = new();
+
     public string FullName => $"{FirstName} {LastName}";
     public string DisplayRole => $"#{JerseyNumber}";
 }

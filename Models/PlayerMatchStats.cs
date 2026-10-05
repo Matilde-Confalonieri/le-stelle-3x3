@@ -34,5 +34,13 @@ public class PlayerMatchStats
     [Range(0, 100)]
     public int Fouls { get; set; }
 
+    [Range(0, 100)]
+    public int FreeThrowsMade { get; set; }
+
+    [Range(0, 100)]
+    public int FreeThrowsAttempted { get; set; }
+
+    public List<Shot> Shots { get; set; } = new();
+
     public double Evaluation => Points + Rebounds + Assists + Steals + Blocks - Fouls;
 }

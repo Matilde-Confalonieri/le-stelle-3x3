@@ -270,6 +270,15 @@ function renderPtsChart(ptsFor, ptsAgainst) {
     });
 }
 
+window.shotChartPoint = (svg, clientX, clientY) => {
+    if (!svg) return null;
+    const r = svg.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return null;
+    const x = (clientX - r.left) / r.width * 500;
+    const y = (clientY - r.top) / r.height * 470;
+    return [x, y];
+};
+
 function renderLastFiveChart(labels, ourPts, theirPts) {
     const ctx = document.getElementById('lastFiveChart');
     if (!ctx) return;
