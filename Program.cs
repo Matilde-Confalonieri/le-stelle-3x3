@@ -25,12 +25,17 @@ builder.Services.AddScoped<ExportService>();
 
 var app = builder.Build();
 
+var forceReseed = string.Equals(
+    Environment.GetEnvironmentVariable("RESEED"),
+    "true",
+    StringComparison.OrdinalIgnoreCase);
+
 using (var scope = app.Services.CreateScope())
 {
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     await using var context = await factory.CreateDbContextAsync();
     await context.Database.EnsureCreatedAsync();
-    await DbSeeder.SeedAsync(context);
+    await DbSeeder.SeedAsync(context, forceReseed);
 }
 
 if (!app.Environment.IsDevelopment())

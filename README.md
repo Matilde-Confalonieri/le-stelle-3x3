@@ -21,7 +21,7 @@ dotnet restore
 dotnet run
 ```
 
-Il database SQLite (`tournament.db`) viene creato automaticamente al primo avvio con dati di esempio.
+Il database viene creato automaticamente al primo avvio con dati di esempio. In locale usa SQLite (`tournament.db`); in produzione usa PostgreSQL (Neon) tramite la variabile d'ambiente `DATABASE_URL`.
 
 L'applicazione sarà disponibile su `https://localhost:5001` e `http://localhost:5000`.
 
@@ -108,17 +108,35 @@ Basato sul design system urban-athletic:
 
 ## Database
 
-Il database SQLite viene creato automaticamente in `tournament.db` nella root del progetto. Per ricrearlo da zero, elimina il file e riavvia l'applicazione.
+Il database viene creato automaticamente al primo avvio. La connessione si legge da:
+
+- `DATABASE_URL` (variabile d'ambiente) se impostata (es. PostgreSQL Neon in produzione)
+- altrimenti `ConnectionStrings:DefaultConnection` (SQLite in locale)
+
+Il seed dei dati demo viene eseguito solo se la tabella `Players` è vuota. Per **forzare il re-seed** (svuota le tabelle demo e reinserisce i dati aggiornati) avvia l'app con:
+
+```bash
+RESEED=true dotnet run
+```
 
 ## Pubblicazione
 
+L'app è configurata per Fly.io (`fly.toml` + `Dockerfile`) con database PostgreSQL Neon.
+
 ```bash
-dotnet publish -c Release -o publish
+# 1. Pubblica la nuova build
+fly deploy
+
+# 2. (Opzionale) Forza il re-seed dei dati demo sul DB di produzione
+fly secrets set RESEED=true
+fly deploy
+fly secrets unset RESEED
 ```
 
-Poi copia la cartella `publish` sul server e avvia con:
+In alternativa, pubblica manualmente:
 
 ```bash
+dotnet publish -c Release -o publish
 dotnet ThreeByThreeManager.dll
 ```
 
