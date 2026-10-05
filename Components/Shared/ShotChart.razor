@@ -2,27 +2,24 @@
 @inject IJSRuntime JS
 
 <svg class="shot-chart" viewBox="0 0 500 470" width="500" height="470" preserveAspectRatio="xMidYMid meet"
+     style="width:100%;max-width:560px;height:auto;display:block;background:#b98a5e;border-radius:8px"
      @ref="svgRef" @onclick="HandleClick" @attributes="AdditionalAttributes">
-    <rect x="0" y="0" width="500" height="467" class="court-floor" />
-    <rect x="0" y="0" width="500" height="467" class="court-outline" />
-
-    <path d="M 30 367.3 L 30 467" class="court-line" />
-    <path d="M 470 367.3 L 470 467" class="court-line" />
-    <path d="M 30 367.3 A 225 225 0 0 1 470 367.3" class="court-line arc" />
-
-    <rect x="168.3" y="273.7" width="163.3" height="193.3" class="court-line" />
-    <path d="M 190 273.7 A 60 60 0 0 1 310 273.7" class="court-line arc" />
-    <path d="M 208.3 467 A 41.7 41.7 0 0 1 291.7 467" class="court-line arc" />
-
-    <line x1="220" y1="467" x2="280" y2="467" class="court-backboard" />
-    <circle cx="250" cy="414.5" r="6" class="court-hoop" />
+    <rect x="0" y="0" width="500" height="467" fill="#d9a86c" />
+    <rect x="0" y="0" width="500" height="467" fill="none" stroke="#2f2417" stroke-width="3" />
+    <path d="M 30 367.3 L 30 467" fill="none" stroke="#2f2417" stroke-width="2" />
+    <path d="M 470 367.3 L 470 467" fill="none" stroke="#2f2417" stroke-width="2" />
+    <path d="M 30 367.3 A 225 225 0 0 1 470 367.3" fill="none" stroke="#2f2417" stroke-width="2" />
+    <rect x="168.3" y="273.7" width="163.3" height="193.3" fill="none" stroke="#2f2417" stroke-width="2" />
+    <path d="M 190 273.7 A 60 60 0 0 1 310 273.7" fill="none" stroke="#2f2417" stroke-width="2" />
+    <path d="M 208.3 467 A 41.7 41.7 0 0 1 291.7 467" fill="none" stroke="#2f2417" stroke-width="2" />
+    <line x1="220" y1="467" x2="280" y2="467" stroke="#2f2417" stroke-width="5" />
+    <circle cx="250" cy="414.5" r="6" fill="#e0481f" />
 
     @foreach (var shot in Shots)
     {
         var cx = shot.X * 33.333;
         var cy = 467 - shot.Y * 33.333;
-        <circle cx="@cx" cy="@cy" r="6"
-                class="@(shot.Made ? "shot-made" : "shot-missed")">
+        <circle cx="@cx" cy="@cy" r="6" fill="@(shot.Made ? "#1e9e3c" : "#e0261f")" stroke="#ffffff" stroke-width="1.5">
             <title>@(shot.IsThree ? "3PT" : "2PT") @(shot.Made ? "segnato" : "sbagliato")</title>
         </circle>
     }
