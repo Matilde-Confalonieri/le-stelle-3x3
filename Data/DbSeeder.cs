@@ -8,11 +8,16 @@ namespace ThreeByThreeManager.Data;
 
 public static class DbSeeder
 {
+    public const int SeedVersion = 2;
+
     private static readonly Random Rng = new(20252026);
 
     public static async Task SeedAsync(ApplicationDbContext context, bool forceReseed = false)
     {
-        if (forceReseed)
+        var storedVersion = await context.SeedInfos.Select(s => s.Version).FirstOrDefaultAsync();
+        var reseed = forceReseed || storedVersion != SeedVersion;
+
+        if (reseed)
         {
             context.Shots.RemoveRange(context.Shots);
             context.PlayerMatchStats.RemoveRange(context.PlayerMatchStats);
@@ -97,6 +102,10 @@ public static class DbSeeder
         });
 
         await context.SaveChangesAsync();
+
+        context.SeedInfos.RemoveRange(context.SeedInfos);
+        context.SeedInfos.Add(new SeedInfo { Version = SeedVersion });
+        await context.SaveChangesAsync();
     }
 
     private static List<Player> BuildPlayers() => new()
@@ -153,27 +162,27 @@ public static class DbSeeder
         switch (player.Role)
         {
             case "Play":
-                fg3a = 4 + Rng.Next(0, 4); fg2a = 6 + Rng.Next(0, 4); fta = 2 + Rng.Next(0, 3);
+                fg3a = 2 + Rng.Next(0, 3); fg2a = 4 + Rng.Next(0, 3); fta = 1 + Rng.Next(0, 2);
                 fg3pct = 0.33 + Rng.NextDouble() * 0.10; fg2pct = 0.45 + Rng.NextDouble() * 0.10;
                 break;
             case "Guardia":
-                fg3a = 5 + Rng.Next(0, 5); fg2a = 5 + Rng.Next(0, 4); fta = 2 + Rng.Next(0, 3);
+                fg3a = 2 + Rng.Next(0, 3); fg2a = 3 + Rng.Next(0, 3); fta = 1 + Rng.Next(0, 2);
                 fg3pct = 0.32 + Rng.NextDouble() * 0.10; fg2pct = 0.45 + Rng.NextDouble() * 0.10;
                 break;
             case "Ala":
-                fg3a = 3 + Rng.Next(0, 4); fg2a = 7 + Rng.Next(0, 4); fta = 2 + Rng.Next(0, 3);
+                fg3a = 2 + Rng.Next(0, 2); fg2a = 4 + Rng.Next(0, 3); fta = 1 + Rng.Next(0, 2);
                 fg3pct = 0.34 + Rng.NextDouble() * 0.10; fg2pct = 0.48 + Rng.NextDouble() * 0.10;
                 break;
             case "Ala Grande":
-                fg3a = 1 + Rng.Next(0, 2); fg2a = 8 + Rng.Next(0, 4); fta = 3 + Rng.Next(0, 3);
+                fg3a = Rng.Next(0, 2); fg2a = 4 + Rng.Next(0, 3); fta = 1 + Rng.Next(0, 2);
                 fg3pct = 0.30 + Rng.NextDouble() * 0.10; fg2pct = 0.50 + Rng.NextDouble() * 0.08;
                 break;
             case "Pivot":
-                fg3a = Rng.Next(0, 2); fg2a = 9 + Rng.Next(0, 4); fta = 3 + Rng.Next(0, 4);
-                fg3pct = 0.28 + Rng.NextDouble() * 0.08; fg2pct = 0.52 + Rng.NextDouble() * 0.08;
+                fg3a = 0; fg2a = 5 + Rng.Next(0, 3); fta = 1 + Rng.Next(0, 2);
+                fg3pct = 0.30; fg2pct = 0.52 + Rng.NextDouble() * 0.08;
                 break;
             default:
-                fg3a = 3; fg2a = 7; fta = 2;
+                fg3a = 1; fg2a = 4; fta = 1;
                 fg3pct = 0.32; fg2pct = 0.48;
                 break;
         }

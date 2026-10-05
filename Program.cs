@@ -38,9 +38,9 @@ using (var scope = app.Services.CreateScope())
 
     await context.Database.EnsureCreatedAsync();
 
-    // Rileva drift dello schema (es. nuova tabella "Shots" aggiunta dopo un deploy precedente)
+    // Rileva drift dello schema (es. nuova tabella "Shots"/"SeedInfos" aggiunta dopo un deploy precedente)
     // e, se serve, ricrea lo schema completo. I dati sono demo e vengono rigenerati dal seed.
-    if (forceReseed || !await TableExistsAsync(context, "Shots"))
+    if (forceReseed || !await TableExistsAsync(context, "Shots") || !await TableExistsAsync(context, "SeedInfos"))
     {
         await RecreateSchemaAsync(context);
     }
@@ -88,6 +88,7 @@ static async Task<bool> TableExistsAsync(ApplicationDbContext context, string ta
 static async Task RecreateSchemaAsync(ApplicationDbContext context)
 {
     const string dropSql = """
+        DROP TABLE IF EXISTS "SeedInfos" CASCADE;
         DROP TABLE IF EXISTS "Shots" CASCADE;
         DROP TABLE IF EXISTS "PlayerMatchStats" CASCADE;
         DROP TABLE IF EXISTS "Matches" CASCADE;

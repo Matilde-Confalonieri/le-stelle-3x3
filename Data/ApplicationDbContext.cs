@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PlayerMatchStats> PlayerMatchStats => Set<PlayerMatchStats>();
     public DbSet<PlaybookScheme> PlaybookSchemes => Set<PlaybookScheme>();
     public DbSet<Shot> Shots => Set<Shot>();
+    public DbSet<SeedInfo> SeedInfos => Set<SeedInfo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
