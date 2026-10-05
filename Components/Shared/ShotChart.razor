@@ -21,7 +21,7 @@
     {
         var cx = shot.X * 33.333;
         var cy = 467 - shot.Y * 33.333;
-        <circle cx="@cx" cy="@cy" r="5"
+        <circle cx="@cx" cy="@cy" r="6"
                 class="@(shot.Made ? "shot-made" : "shot-missed")">
             <title>@(shot.IsThree ? "3PT" : "2PT") @(shot.Made ? "segnato" : "sbagliato")</title>
         </circle>

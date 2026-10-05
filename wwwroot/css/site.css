@@ -328,21 +328,21 @@ label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-
     display: block;
     cursor: crosshair;
     border-radius: 8px;
-    background: var(--bg-card);
+    background: #b98a5e;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
 }
-.court-floor { fill: #1d1d1d; }
-.court-outline { fill: none; stroke: var(--border); stroke-width: 2; }
-.court-line { fill: none; stroke: #e6e6e6; stroke-width: 1.5; opacity: 0.7; }
+.court-floor { fill: #d9a86c; }
+.court-outline { fill: none; stroke: #2f2417; stroke-width: 3; }
+.court-line { fill: none; stroke: #2f2417; stroke-width: 2; opacity: 0.9; }
 .court-line.arc { stroke-linecap: round; }
-.court-backboard { stroke: #e6e6e6; stroke-width: 4; }
-.court-hoop { fill: var(--brand); }
-.shot-made { fill: var(--color-win); stroke: #ffffff; stroke-width: 1; opacity: 0.95; }
-.shot-missed { fill: var(--color-loss); stroke: #ffffff; stroke-width: 1; opacity: 0.9; }
+.court-backboard { stroke: #2f2417; stroke-width: 5; }
+.court-hoop { fill: #e0481f; }
+.shot-made { fill: #1e9e3c; stroke: #ffffff; stroke-width: 1.5; opacity: 1; }
+.shot-missed { fill: #e0261f; stroke: #ffffff; stroke-width: 1.5; opacity: 1; }
 .shot-chart:not([data-interactive="true"]) { cursor: default; }
 .shot-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); }
 .shot-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
-.shot-legend .dot.made { background: var(--color-win); }
-.shot-legend .dot.missed { background: var(--color-loss); }
+.shot-legend .dot.made { background: #1e9e3c; }
+.shot-legend .dot.missed { background: #e0261f; }
