@@ -325,7 +325,6 @@ label.text-label-caps { font-family: var(--font-display); font-size: 11px; font-
     width: 100%;
     max-width: 560px;
     height: auto;
-    aspect-ratio: 500 / 470;
     display: block;
     cursor: crosshair;
     border-radius: 8px;
